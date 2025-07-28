@@ -79,7 +79,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
 }
 
 .status-badge {
@@ -112,27 +116,51 @@
 
 .summary-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 .stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
 .stat-label {
-  color: #555;
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: #666;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  display: block;
 }
 
 .stat-value {
   color: #333;
-  font-weight: 500;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: block;
 }
 
 .rewards-section {
@@ -175,6 +203,24 @@
   color: #333;
   font-size: 0.95rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reward-tick {
+  color: #28a745;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.reward-item.earned {
+  background: #f8fff9;
+  border-left-color: #28a745;
+}
+
+.reward-item.earned .reward-text {
+  color: #155724;
 }
 
 .no-rewards {
@@ -213,6 +259,18 @@
   .summary-stats {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+  
+  .stat-item {
+    padding: 14px;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
   }
   
   .table-header,

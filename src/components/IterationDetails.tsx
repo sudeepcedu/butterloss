@@ -30,28 +30,28 @@ const IterationDetails: React.FC<IterationDetailsProps> = ({ iteration, onClose 
           
           <div className="summary-stats">
             <div className="stat-item">
-              <span className="stat-label">Starting Weight:</span>
+              <span className="stat-label">⚖️ Starting Weight</span>
               <span className="stat-value">{summary.startingWeight} kg</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Target Weight:</span>
+              <span className="stat-label">🎯 Target Weight</span>
               <span className="stat-value">{summary.targetWeight} kg</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Final Weight:</span>
+              <span className="stat-label">📊 Final Weight</span>
               <span className="stat-value">{summary.finalWeight} kg</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Weight Lost:</span>
+              <span className="stat-label">📉 Weight Lost</span>
               <span className="stat-value">{summary.weightLost} kg</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Total Deficit:</span>
+              <span className="stat-label">🔥 Total Deficit</span>
               <span className="stat-value">{summary.totalDeficitBurned.toLocaleString()} cal</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">Butter Packs:</span>
-              <span className="stat-value">🧈 {summary.butterPacksEarned}</span>
+              <span className="stat-label">🧈 Butter Packs</span>
+              <span className="stat-value">{summary.butterPacksEarned}</span>
             </div>
           </div>
         </div>
@@ -61,12 +61,20 @@ const IterationDetails: React.FC<IterationDetailsProps> = ({ iteration, onClose 
           <div className="rewards-container">
             {rewards && rewards.length > 0 ? (
               <div className="rewards-list">
-                {rewards.map((reward, index) => (
-                  <div key={index} className="reward-item">
-                    <span className="reward-icon">🎁</span>
-                    <span className="reward-text">{reward}</span>
-                  </div>
-                ))}
+                {rewards.map((reward, index) => {
+                  const percentage = (index + 1) * 25; // 25%, 50%, 75%, 100%
+                  const isEarned = summary.totalDeficitBurned >= (summary.totalDeficitBurned / 4) * (index + 1);
+                  
+                  return (
+                    <div key={index} className={`reward-item ${isEarned ? 'earned' : ''}`}>
+                      <span className="reward-icon">🎁</span>
+                      <span className="reward-text">
+                        {percentage}% - {reward}
+                        {isEarned && <span className="reward-tick">✓</span>}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="no-rewards">No rewards were earned during this iteration.</p>
