@@ -1,88 +1,83 @@
-# 🧈 ButterLoss - Weight Loss Tracker
+# 🧈 ButterLoss - Weight Loss Tracking App
 
-A beautiful and motivating weight loss tracking application that visualizes your calorie deficit progress and rewards you with butter packs for your achievements!
+A modern, intuitive web application for tracking your weight loss journey through calorie deficit monitoring. Built with React, TypeScript, and beautiful UI components.
 
 ## ✨ Features
 
-### 🎯 Core Functionality
-- **User Setup**: Enter your name, age, height, current weight, and target weight
-- **Daily Logging**: Track your daily calorie deficit and weight
-- **Progress Visualization**: See your calorie deficit progress with beautiful charts
-- **Butter Collection**: Collect butter packs (1000 calories = 1 butter pack = 100g fat)
-- **Estimated Completion**: Calculate how long it will take to reach your goal
+### 📊 **Dashboard**
+- **Calorie Deficit Progress**: Visual progress bar with animated green gradient
+- **Current Streak**: Track consecutive days with positive deficit
+- **Butter & Ghee Collection**: Collect butter packs (770 cal) and ghee packs (7700 cal)
+- **Estimated Completion**: Smart calculation based on daily deficit goals
+- **Average Daily Deficit**: Accurate tracking of your daily calorie burn
 
-### 📊 Dashboard Features
-- **Calorie Deficit Progress Bar**: Visual representation of your progress
-- **Weight Chart**: Track your weight changes over time
-- **Statistics**: Current deficit, remaining deficit, and progress percentage
-- **Estimated Completion**: Set daily deficit goals and see projected completion dates
+### 📅 **Calendar View**
+- **Monthly Calendar**: Log deficits for any date
+- **Visual Indicators**: Color-coded entries (green for positive, red for negative)
+- **Hover Actions**: Remove entries with ease
+- **Auto-focus**: Seamless input experience
 
-### 🧈 Butter Collection
-- **Visual Butter Packs**: See your collected butter packs in a beautiful grid
-- **Fat Loss Tracking**: Each butter pack represents 100g of fat lost
-- **Motivational Rewards**: Gamify your weight loss journey
+### 🧈 **Butter Collection**
+- **Butter Packs**: Earn 1 pack per 770 calories deficit
+- **Ghee Packs**: Earn 1 pack per 7700 calories deficit (premium reward)
+- **Visual Display**: Beautiful icons with progress tracking
 
-## 🚀 Getting Started
+### ⚖️ **Weight Loss Tracking**
+- **Progress Chart**: Interactive line chart showing weight trends
+- **Log Table**: Detailed weight entries with dates
+- **Progress to Goal**: Percentage-based progress tracking
 
-### Prerequisites
-- Node.js (version 14 or higher)
+### 🏆 **Rewards System**
+- **Four Milestones**: The Beginning (25%), The Climb (50%), Breakthrough (75%), Transformation (100%)
+- **Customizable Rewards**: Edit your own reward goals
+- **Confetti Animation**: Celebrate achievements with style
+- **Progress Bars**: Visual slice-specific progress tracking
+
+### 🔄 **Iterations Feature**
+- **Multiple Cycles**: Track multiple weight loss journeys
+- **Iteration History**: View completed cycles with detailed summaries
+- **Weight Input**: Accurate weight tracking for goal completion
+- **Reset Functionality**: Start fresh with new goals
+
+## 🧮 **Calculations**
+
+### **Core Metrics**
+- **Calories per kg fat**: 7,716.17 calories
+- **Butter pack threshold**: 770 calories (100g fat)
+- **Ghee pack threshold**: 7,700 calories (1kg fat)
+- **Daily deficit goal**: 1-7,700 calories (customizable)
+
+### **Example**
+- **Goal**: Lose 5kg
+- **Total deficit needed**: 5 × 7,716.17 = 38,580 calories
+- **Butter packs to collect**: 38,580 ÷ 770 = 50 packs
+- **Ghee packs to collect**: 38,580 ÷ 7,700 = 5 packs
+
+## 🚀 **Getting Started**
+
+### **Prerequisites**
+- Node.js (v14 or higher)
 - npm or yarn
 
-### Installation
-
-1. Clone the repository:
+### **Installation**
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/yourusername/butterloss.git
 cd butterloss
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Start the development server:
-```bash
+# Start development server
 npm start
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+### **Build for Production**
+```bash
+npm run build
+```
 
-## 📱 How to Use
-
-### 1. Initial Setup
-- Enter your personal information (name, age, height, current weight, target weight)
-- The app calculates your total calorie deficit needed to reach your goal
-
-### 2. Daily Logging
-- Log your daily calorie deficit (calories burned minus calories consumed)
-- Record your current weight
-- Watch your progress bar fill up!
-
-### 3. Track Progress
-- View your calorie deficit progress on the dashboard
-- See your weight changes over time in the chart
-- Check your estimated completion date based on your daily deficit goals
-
-### 4. Collect Butter Packs
-- Every 1000 calories deficit = 1 butter pack (100g fat)
-- Visit the Butter Collection page to see your accumulated packs
-- Stay motivated by watching your collection grow!
-
-## 🧮 Calculations
-
-### Calorie Deficit
-- **Total Deficit Needed**: Target weight loss (kg) × 7700 calories
-- **Butter Packs**: Total deficit ÷ 1000 calories
-- **Fat Loss**: Butter packs × 100g
-
-### Example
-- Goal: Lose 5kg
-- Total deficit needed: 5 × 7700 = 38,500 calories
-- Butter packs to collect: 38,500 ÷ 1000 = 38.5 packs
-- Total fat loss: 38.5 × 100g = 3.85kg fat
-
-## 🎨 Design Features
+## 🎨 **Design Features**
 
 - **Modern UI**: Clean, responsive design with beautiful gradients
 - **Mobile Friendly**: Works perfectly on all device sizes
@@ -90,21 +85,21 @@ npm start
 - **Colorful Visuals**: Butter packs with golden gradients
 - **Progress Indicators**: Clear visual feedback on your journey
 
-## 💾 Data Storage
+## 💾 **Data Storage**
 
-- All data is stored locally in your browser using localStorage
-- No account required - your data stays private
-- Reset button available to start fresh
+- **Local Storage**: All data stored locally in your browser
+- **No Account Required**: Your data stays private
+- **Reset Options**: Clear data and start fresh anytime
 
-## 🛠️ Technology Stack
+## 🛠️ **Technology Stack**
 
 - **React 18** with TypeScript
 - **Recharts** for data visualization
 - **date-fns** for date manipulation
-- **CSS-in-JS** for styling
+- **CSS Modules** for styling
 - **Local Storage** for data persistence
 
-## 📊 Key Metrics
+## 📱 **Key Metrics**
 
 - **Calorie Deficit Progress**: Visual progress bar showing completion percentage
 - **Weight Tracking**: Line chart showing weight changes over time
@@ -112,35 +107,45 @@ npm start
 - **Estimated Completion**: Projected completion date based on daily goals
 - **Average Daily Deficit**: Calculated from your logged entries
 
-## 🎯 Tips for Success
+## 🎯 **Tips for Success**
 
 1. **Set Realistic Goals**: Aim for 300-700 calories daily deficit
 2. **Be Consistent**: Log your progress every day
-3. **Combine Methods**: Use both diet and exercise for better results
-4. **Stay Patient**: Healthy weight loss takes time
-5. **Track Everything**: Log both deficit and weight for accurate progress
+3. **Track Trends**: Focus on long-term progress, not daily fluctuations
+4. **Celebrate Wins**: Use the rewards system to stay motivated
+5. **Stay Patient**: Weight loss is a journey, not a sprint
 
-## 🔄 Reset Data
+## 🔧 **Development**
 
-Use the reset button in the header to clear all your data and start fresh. This will remove your user profile and all logged entries.
+### **Project Structure**
+```
+src/
+├── components/          # React components
+├── utils/              # Utility functions
+├── types.ts            # TypeScript interfaces
+└── App.tsx            # Main application
+```
 
-## 📈 Future Enhancements
+### **Key Components**
+- `UserSetup`: Initial user configuration
+- `DailyLogForm`: Daily deficit logging
+- `Calendar`: Monthly calendar view
+- `WeightLoss`: Weight tracking and charts
+- `Rewards`: Milestone tracking system
+- `IterationHistory`: Multiple cycle management
 
-- Export data functionality
-- Multiple user profiles
-- Advanced analytics and insights
-- Social sharing features
-- Achievement badges and milestones
-- Integration with fitness trackers
+## 📄 **License**
 
-## 🤝 Contributing
+This project is open source and available under the [MIT License](LICENSE).
 
-Feel free to contribute to this project by submitting issues or pull requests!
+## 🤝 **Contributing**
 
-## 📄 License
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-This project is open source and available under the MIT License.
+## 📞 **Support**
+
+If you have any questions or need help, please open an issue on GitHub.
 
 ---
 
-**Start your weight loss journey today and collect those butter packs! 🧈✨** 
+**Made with ❤️ for your weight loss journey** 
