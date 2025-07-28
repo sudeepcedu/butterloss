@@ -530,8 +530,16 @@ const App: React.FC = () => {
 
   const resetIteration = () => {
     if (window.confirm('Are you sure you want to reset the current iteration? This will remove all calorie deficit entries and weight log entries from the current iteration. This cannot be undone.')) {
-      // Clear all logs for current iteration
-      setLogs([]);
+      // Find the initial weight log (the first weight entry from the current iteration)
+      const initialWeightLog = logs.find(log => 
+        log.weight !== null && 
+        new Date(log.date) >= new Date(currentIterationStartDate)
+      );
+      
+      // Clear all logs but preserve the initial weight if it exists
+      const preservedLogs = initialWeightLog ? [initialWeightLog] : [];
+      setLogs(preservedLogs);
+      
       // Reset iteration start date to today
       const today = new Date().toISOString().split('T')[0];
       setCurrentIterationStartDate(today);
