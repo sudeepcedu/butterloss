@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { WeightLossData } from '../types';
-import { calculateEstimatedDays } from '../utils/calculations';
+import { calculateEstimatedDays, calculateAverageDailyDeficit } from '../utils/calculations';
 import './EstimatedCompletion.css';
 
 interface EstimatedCompletionProps {
@@ -15,9 +15,7 @@ const EstimatedCompletion: React.FC<EstimatedCompletionProps> = ({ data, onUpdat
   
   const dailyDeficitGoal = data.user.dailyDeficitGoal;
   const estimatedDays = calculateEstimatedDays(data.remainingDeficit, dailyDeficitGoal);
-  const averageDailyDeficit = data.logs.length > 0 
-    ? data.logs.reduce((sum, log) => sum + (log.deficit || 0), 0) / data.logs.length 
-    : 0;
+  const averageDailyDeficit = calculateAverageDailyDeficit(data.logs);
 
   // Focus the input field when editing starts
   useEffect(() => {

@@ -87,9 +87,12 @@ export const calculateEstimatedDays = (remainingDeficit: number, dailyDeficit: n
 };
 
 export const calculateAverageDailyDeficit = (logs: DailyLog[]): number => {
-  if (logs.length === 0) return 0;
-  const totalDeficit = logs.reduce((sum, log) => sum + (log.deficit || 0), 0);
-  return totalDeficit / logs.length;
+  // Only count logs that have a deficit (not null)
+  const deficitLogs = logs.filter(log => log.deficit !== null);
+  if (deficitLogs.length === 0) return 0;
+  
+  const totalDeficit = deficitLogs.reduce((sum, log) => sum + (log.deficit || 0), 0);
+  return totalDeficit / deficitLogs.length;
 };
 
 export const calculateBMI = (weight: number, height: number): number => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserSetup from './components/UserSetup';
 import DailyLogForm from './components/DailyLogForm';
 import DeficitProgress from './components/DeficitProgress';
@@ -35,14 +35,14 @@ const App: React.FC = () => {
   const [selectedIteration, setSelectedIteration] = useState<IterationData | null>(null);
 
   // Custom setUser function to prevent accidental null resets
-  const setUserSafely = useCallback((newUser: User | null) => {
+  const setUserSafely = (newUser: User | null) => {
     if (newUser === null && user !== null) {
       console.log('Preventing user reset to null - user already exists');
       return;
     }
     console.log('Setting user safely:', newUser);
     setUser(newUser);
-  }, [user]);
+  };
 
   useEffect(() => {
     console.log('Current view changed:', currentView);
@@ -105,7 +105,7 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('Error loading from localStorage:', error);
     }
-  }, [setUserSafely]);
+  }, []);
 
   useEffect(() => {
     console.log('Saving to localStorage:', { user, logs, iterations, currentIterationStartDate });
@@ -318,6 +318,12 @@ const App: React.FC = () => {
     }
 
     const currentDeficit = calculateCurrentDeficit(logs);
+    const butterPacks = calculateButterPacks(logs);
+    const endDate = new Date().toISOString().split('T')[0];
+    const duration = Math.ceil((new Date(endDate).getTime() - new Date(currentIterationStartDate).getTime()) / (1000 * 60 * 60 * 24));
+
+    // Calculate weight lost based on the starting weight of this iteration
+    const weightLost = user.weight - currentWeight;
 
     // Calculate which rewards were earned during this iteration
     const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
@@ -341,6 +347,20 @@ const App: React.FC = () => {
         earnedRewards.push(rewards[i] || defaultRewards[i]);
       }
     }
+
+    const iterationSummary: IterationSummary = {
+      id: `iteration_${Date.now()}`,
+      startDate: currentIterationStartDate,
+      endDate: endDate,
+      startingWeight: user.weight,
+      targetWeight: user.targetWeight,
+      finalWeight: currentWeight,
+      weightLost: weightLost,
+      totalDeficitBurned: currentDeficit,
+      butterPacksEarned: butterPacks,
+      duration: duration,
+      isCompleted: true
+    };
 
     // Don't add to iterations yet - only when user starts new iteration
     setShowWeightInput(false);
@@ -383,6 +403,12 @@ const App: React.FC = () => {
     }
     
     const currentDeficit = calculateCurrentDeficit(logs);
+    const butterPacks = calculateButterPacks(logs);
+    const endDate = new Date().toISOString().split('T')[0];
+    const duration = Math.ceil((new Date(endDate).getTime() - new Date(currentIterationStartDate).getTime()) / (1000 * 60 * 60 * 24));
+
+    // Calculate weight lost based on the starting weight of this iteration
+    const weightLost = user.weight - lastLoggedWeight;
 
     // Calculate which rewards were earned during this iteration
     const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
@@ -406,6 +432,20 @@ const App: React.FC = () => {
         earnedRewards.push(rewards[i] || defaultRewards[i]);
       }
     }
+
+    const iterationSummary: IterationSummary = {
+      id: `iteration_${Date.now()}`,
+      startDate: currentIterationStartDate,
+      endDate: endDate,
+      startingWeight: user.weight,
+      targetWeight: user.targetWeight,
+      finalWeight: lastLoggedWeight,
+      weightLost: weightLost,
+      totalDeficitBurned: currentDeficit,
+      butterPacksEarned: butterPacks,
+      duration: duration,
+      isCompleted: true
+    };
 
     // Don't add to iterations yet - only when user starts new iteration
     setShowWeightInput(false);
@@ -576,12 +616,7 @@ const App: React.FC = () => {
             🏆 Rewards
           </button>
         </nav>
-        <button className="reset-btn" onClick={resetData}>
-          🔄 Reset
-        </button>
-        <button className="clear-cache-btn" onClick={clearCacheAndRestart}>
-          🧹 Clear Cache & Restart
-        </button>
+
       </header>
 
       <main className="app-main">
