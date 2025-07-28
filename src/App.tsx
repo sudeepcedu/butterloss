@@ -564,7 +564,7 @@ const App: React.FC = () => {
   const restartJourney = () => {
     if (!user) return;
     
-    if (window.confirm('Are you sure you want to restart your journey? This will clear all current progress and take you back to the welcome screen. Your name, age, and height will be pre-filled with your current information.')) {
+    if (window.confirm('Are you sure you want to restart your journey? This will clear all current progress and take you back to the welcome screen.')) {
       // Save current user info for pre-filling
       const userInfo = {
         name: user.name,

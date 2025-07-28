@@ -196,6 +196,8 @@ const Calendar: React.FC<CalendarProps> = ({ logs, onLogSubmit, currentWeight })
         </div>
       )}
 
+
+
       <div className="calendar-legend">
         <div className="legend-item">
           <div className="legend-color has-log"></div>

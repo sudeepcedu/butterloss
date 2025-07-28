@@ -70,6 +70,77 @@
   transform: translateY(0);
 }
 
+.log-confirmation {
+  background: #f8f9fa;
+  border: 2px solid #28a745;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+}
+
+.confirmation-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.confirmation-icon {
+  font-size: 2.5rem;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.confirmation-text {
+  text-align: left;
+}
+
+.confirmation-text p {
+  margin: 5px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.confirmation-text strong {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.edit-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  background: #667eea;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
 @media (max-width: 768px) {
   .daily-log-form {
     padding: 20px;
@@ -78,5 +149,33 @@
   .log-btn {
     padding: 12px 24px;
     font-size: 1rem;
+  }
+
+  .log-confirmation {
+    padding: 15px;
+  }
+
+  .confirmation-message {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .confirmation-icon {
+    font-size: 2rem;
+  }
+
+  .confirmation-text p {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .edit-btn {
+    width: 100%;
+    padding: 10px 16px;
   }
 } 
