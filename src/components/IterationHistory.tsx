@@ -49,12 +49,12 @@ const IterationHistory: React.FC<IterationHistoryProps> = ({ iterations, onViewD
                     </>
                   )}
                 </div>
-                <span className="iteration-duration">{summary.duration} DAYS</span>
+                <span className="iteration-duration">{isNaN(summary.duration) ? 'N/A' : `${summary.duration} DAYS`}</span>
               </div>
               
               <div className="iteration-dates">
                 <span className="date-range">
-                  {new Date(summary.startDate).toLocaleDateString()} - {new Date(summary.endDate).toLocaleDateString()}
+                  {summary.startDate ? new Date(summary.startDate).toLocaleDateString() : 'Invalid Date'} - {summary.endDate ? new Date(summary.endDate).toLocaleDateString() : 'Invalid Date'}
                 </span>
               </div>
               

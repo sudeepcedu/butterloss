@@ -34,6 +34,9 @@ const App: React.FC = () => {
   const [currentIterationStartDate, setCurrentIterationStartDate] = useState<string>('');
   const [selectedIteration, setSelectedIteration] = useState<IterationData | null>(null);
 
+  // Helper function to get current date in YYYY-MM-DD format
+  const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
+
   // Custom setUser function to prevent accidental null resets
   const setUserSafely = useCallback((newUser: User | null) => {
     if (newUser === null && user !== null) {
@@ -98,7 +101,7 @@ const App: React.FC = () => {
         setCurrentIterationStartDate(savedIterationStartDate);
       } else {
         // Set current date as iteration start date if not set
-        const today = new Date().toISOString().split('T')[0];
+        const today = getCurrentDate();
         setCurrentIterationStartDate(today);
         localStorage.setItem('butterloss_iteration_start_date', today);
       }
@@ -233,8 +236,9 @@ const App: React.FC = () => {
     if (goalCompletedHandled) {
       const currentDeficit = calculateCurrentDeficit(logs);
       const butterPacks = calculateButterPacks(logs);
-      const endDate = new Date().toISOString().split('T')[0];
-      const duration = Math.ceil((new Date(endDate).getTime() - new Date(currentIterationStartDate).getTime()) / (1000 * 60 * 60 * 24));
+      const endDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+      const startDate = currentIterationStartDate || new Date().toISOString().split('T')[0];
+      const duration = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
 
       // Calculate weight lost based on the starting weight of this iteration
       const finalWeight = getCurrentWeight();
@@ -266,7 +270,7 @@ const App: React.FC = () => {
     // Create iteration summary (unused but kept for future use)
     const _iterationSummary: IterationSummary = {
       id: `iteration_${Date.now()}`,
-      startDate: currentIterationStartDate,
+      startDate: currentIterationStartDate || getCurrentDate(),
       endDate: endDate,
       startingWeight: user.weight,
       targetWeight: user.targetWeight,
@@ -296,7 +300,7 @@ const App: React.FC = () => {
     console.log('⚖️ Weight input completed with weight:', currentWeight);
 
     // Add weight log entry for today's date
-    const today = new Date().toISOString().split('T')[0];
+    const today = getCurrentDate();
     const weightLogEntry: DailyLog = {
       date: today,
       deficit: null,
@@ -320,8 +324,9 @@ const App: React.FC = () => {
 
     const currentDeficit = calculateCurrentDeficit(logs);
     const butterPacks = calculateButterPacks(logs);
-    const endDate = new Date().toISOString().split('T')[0];
-    const duration = Math.ceil((new Date(endDate).getTime() - new Date(currentIterationStartDate).getTime()) / (1000 * 60 * 60 * 24));
+    const endDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const startDate = currentIterationStartDate || new Date().toLocaleDateString('en-CA');
+    const duration = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
 
     // Calculate weight lost based on the starting weight of this iteration
     const weightLost = user.weight - currentWeight;
@@ -353,7 +358,7 @@ const App: React.FC = () => {
     // Create iteration summary (unused but kept for future use)
     const _iterationSummary2: IterationSummary = {
       id: `iteration_${Date.now()}`,
-      startDate: currentIterationStartDate,
+      startDate: currentIterationStartDate || getCurrentDate(),
       endDate: endDate,
       startingWeight: user.weight,
       targetWeight: user.targetWeight,
@@ -383,7 +388,7 @@ const App: React.FC = () => {
     console.log('⏭️ Weight input skipped, using last logged weight:', lastLoggedWeight);
 
     // Add weight log entry for today's date using last logged weight
-    const today = new Date().toISOString().split('T')[0];
+    const today = getCurrentDate();
     const weightLogEntry: DailyLog = {
       date: today,
       deficit: null,
@@ -407,8 +412,9 @@ const App: React.FC = () => {
     
     const currentDeficit = calculateCurrentDeficit(logs);
     const butterPacks = calculateButterPacks(logs);
-    const endDate = new Date().toISOString().split('T')[0];
-    const duration = Math.ceil((new Date(endDate).getTime() - new Date(currentIterationStartDate).getTime()) / (1000 * 60 * 60 * 24));
+    const endDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const startDate = currentIterationStartDate || new Date().toLocaleDateString('en-CA');
+    const duration = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
 
     // Calculate weight lost based on the starting weight of this iteration
     const weightLost = user.weight - lastLoggedWeight;
@@ -439,7 +445,7 @@ const App: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const iterationSummary: IterationSummary = {
       id: `iteration_${Date.now()}`,
-      startDate: currentIterationStartDate,
+      startDate: currentIterationStartDate || getCurrentDate(),
       endDate: endDate,
       startingWeight: user.weight,
       targetWeight: user.targetWeight,
@@ -473,7 +479,7 @@ const App: React.FC = () => {
     setUserSafely(updatedUser);
 
     // Add weight log entry for today's date
-    const today = new Date().toISOString().split('T')[0];
+    const today = getCurrentDate();
     const weightLogEntry: DailyLog = {
       date: today,
       deficit: null,
@@ -482,7 +488,7 @@ const App: React.FC = () => {
 
     // Reset all tracking data and add initial weight log
     setLogs([weightLogEntry]);
-    setCurrentIterationStartDate(new Date().toISOString().split('T')[0]);
+    setCurrentIterationStartDate(getCurrentDate());
     setGoalCompletedHandled(false);
     
     // Clear localStorage for current iteration
