@@ -135,6 +135,25 @@
   box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
 }
 
+.restart-journey-btn {
+  background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(156, 39, 176, 0.3);
+}
+
+.restart-journey-btn:hover {
+  background: linear-gradient(135deg, #8e24aa, #6a1b9a);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+}
+
 .test-iteration-btn {
   background: linear-gradient(135deg, #ffc107, #e0a800);
   color: #333;

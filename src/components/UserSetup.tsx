@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import './UserSetup.css';
 
@@ -7,14 +7,44 @@ interface UserSetupProps {
 }
 
 const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    height: '',
-    weight: '',
-    targetWeight: '',
-    dailyDeficitGoal: '500'
-  });
+  // Check for pre-filled information from restart
+  const getPrefilledData = () => {
+    try {
+      const restartInfo = localStorage.getItem('butterloss_restart_info');
+      if (restartInfo) {
+        const parsedInfo = JSON.parse(restartInfo);
+        return {
+          name: parsedInfo.name || '',
+          age: parsedInfo.age?.toString() || '',
+          height: parsedInfo.height?.toString() || '',
+          weight: '',
+          targetWeight: '',
+          dailyDeficitGoal: '500'
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing restart info:', error);
+    }
+    return {
+      name: '',
+      age: '',
+      height: '',
+      weight: '',
+      targetWeight: '',
+      dailyDeficitGoal: '500'
+    };
+  };
+
+  const [formData, setFormData] = useState(getPrefilledData());
+
+  // Clear restart info after it's used
+  useEffect(() => {
+    const restartInfo = localStorage.getItem('butterloss_restart_info');
+    if (restartInfo) {
+      localStorage.removeItem('butterloss_restart_info');
+      console.log('🧹 Cleared restart info after pre-filling form');
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

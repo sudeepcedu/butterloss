@@ -555,6 +555,47 @@ const App: React.FC = () => {
     }
   };
 
+  const restartJourney = () => {
+    if (!user) return;
+    
+    if (window.confirm('Are you sure you want to restart your journey? This will clear all current progress and take you back to the welcome screen. Your name, age, and height will be pre-filled with your current information.')) {
+      // Save current user info for pre-filling
+      const userInfo = {
+        name: user.name,
+        age: user.age,
+        height: user.height
+      };
+      
+      // Clear all progress data
+      localStorage.removeItem('butterloss_logs');
+      localStorage.removeItem('butterloss_rewards');
+      localStorage.removeItem('butterloss_iterations');
+      localStorage.removeItem('butterloss_iteration_start_date');
+      for (let i = 0; i < 4; i++) {
+        localStorage.removeItem(`milestone_${i}_achieved`);
+      }
+      
+      // Clear user data but keep the basic info for pre-filling
+      localStorage.removeItem('butterloss_user');
+      
+      // Store user info for pre-filling
+      localStorage.setItem('butterloss_restart_info', JSON.stringify(userInfo));
+      
+      // Reset all state
+      setUser(null);
+      setLogs([]);
+      setIterations([]);
+      setCurrentIterationStartDate('');
+      setShowWeightInput(false);
+      setShowIterationSetup(false);
+      setSelectedIteration(null);
+      setGoalCompletedHandled(false);
+      setCurrentView('setup');
+      
+      console.log('🔄 Journey restarted successfully');
+    }
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clearCacheAndRestart = () => {
     if (window.confirm('This will clear all localStorage and restart the app. Continue?')) {
@@ -657,6 +698,9 @@ const App: React.FC = () => {
               )}
               <button onClick={resetIteration} className="reset-iteration-btn">
                 🔄 Reset Iteration
+              </button>
+              <button onClick={restartJourney} className="restart-journey-btn">
+                🚀 Restart Journey
               </button>
             </div>
           </div>
