@@ -1,0 +1,253 @@
+.butter-collection {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.butter-collection h3 {
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.collection-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 1rem;
+}
+
+.collection-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  min-height: 80px;
+}
+
+.stat-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  line-height: 1.4;
+  width: 100%;
+}
+
+.stat-text .number {
+  color: #667eea;
+  font-weight: 800;
+  font-size: 2.5rem;
+}
+
+.butter-display {
+  margin-bottom: 30px;
+}
+
+.butter-display h4 {
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.butter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.butter-pack {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #fff8dc 0%, #fffacd 100%);
+  border: 2px solid #e6c200;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  box-shadow: 0 4px 8px rgba(230, 194, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.butter-pack:hover {
+  transform: scale(1.1);
+}
+
+.empty-collection {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.empty-collection p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.ghee-collection {
+  margin-bottom: 25px;
+}
+
+.ghee-collection h4 {
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.ghee-description {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.ghee-display {
+  margin-bottom: 20px;
+}
+
+.ghee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ghee-pack {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #faf0e6 0%, #fff8dc 100%);
+  border: 3px solid #b8860b;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  box-shadow: 0 6px 12px rgba(184, 134, 11, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ghee-pack::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.ghee-pack:hover {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 20px rgba(184, 134, 11, 0.6);
+}
+
+.ghee-pack:hover::before {
+  transform: translateX(100%);
+}
+
+.empty-ghee {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-ghee .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.empty-ghee p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.collection-tips {
+  background: #e8f4fd;
+  border-radius: 10px;
+  padding: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.collection-tips h4 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.collection-tips ul {
+  list-style: none;
+  padding: 0;
+}
+
+.collection-tips li {
+  color: #555;
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.collection-tips li:before {
+  content: "💡";
+  position: absolute;
+  left: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .butter-collection {
+    padding: 20px;
+  }
+  
+  .collection-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .stat-item {
+    min-height: 70px;
+    padding: 15px;
+  }
+  
+  .butter-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 8px;
+  }
+  
+  .ghee-grid {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 8px;
+  }
+  
+  .butter-pack {
+    font-size: 2rem;
+  }
+  
+  .ghee-pack {
+    font-size: 2.5rem;
+  }
+} 
