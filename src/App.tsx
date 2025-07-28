@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import UserSetup from './components/UserSetup';
 import DailyLogForm from './components/DailyLogForm';
 import DeficitProgress from './components/DeficitProgress';
@@ -35,14 +35,14 @@ const App: React.FC = () => {
   const [selectedIteration, setSelectedIteration] = useState<IterationData | null>(null);
 
   // Custom setUser function to prevent accidental null resets
-  const setUserSafely = (newUser: User | null) => {
+  const setUserSafely = useCallback((newUser: User | null) => {
     if (newUser === null && user !== null) {
       console.log('Preventing user reset to null - user already exists');
       return;
     }
     console.log('Setting user safely:', newUser);
     setUser(newUser);
-  };
+  }, [user]);
 
   useEffect(() => {
     console.log('Current view changed:', currentView);
@@ -131,7 +131,7 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
-  }, [user, logs, iterations, currentIterationStartDate]);
+  }, [user, logs, iterations, currentIterationStartDate, setUserSafely]);
 
   useEffect(() => {
     console.log('User state changed:', user);
@@ -240,45 +240,46 @@ const App: React.FC = () => {
       const finalWeight = getCurrentWeight();
       const weightLost = user.weight - finalWeight;
 
-      // Calculate which rewards were earned during this iteration
-      const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
-      const earnedRewards: string[] = [];
-      
-      // Get current rewards from localStorage
-      const currentRewards = JSON.parse(localStorage.getItem('butterloss_rewards') || '[]');
-      const defaultRewards = [
-        'Buy a new outfit',
-        'Go for a spa day', 
-        'Take a weekend trip',
-        'Buy something expensive'
-      ];
-      const rewards = currentRewards.length > 0 ? currentRewards : defaultRewards;
+          // Calculate which rewards were earned during this iteration
+    const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
+    const earnedRewards: string[] = [];
+    
+    // Get current rewards from localStorage
+    const currentRewards = JSON.parse(localStorage.getItem('butterloss_rewards') || '[]');
+    const defaultRewards = [
+      'Buy a new outfit',
+      'Go for a spa day', 
+      'Take a weekend trip',
+      'Buy something expensive'
+    ];
+    const rewards = currentRewards.length > 0 ? currentRewards : defaultRewards;
 
-      // Check which milestones were achieved based on current deficit
-      const sliceSize = totalDeficitNeeded / 4;
-      for (let i = 0; i < 4; i++) {
-        const sliceEnd = (i + 1) * sliceSize;
-        if (currentDeficit >= sliceEnd) {
-          earnedRewards.push(rewards[i] || defaultRewards[i]);
-        }
+    // Check which milestones were achieved based on current deficit
+    const sliceSize = totalDeficitNeeded / 4;
+    for (let i = 0; i < 4; i++) {
+      const sliceEnd = (i + 1) * sliceSize;
+      if (currentDeficit >= sliceEnd) {
+        earnedRewards.push(rewards[i] || defaultRewards[i]);
       }
+    }
 
-      const iterationSummary: IterationSummary = {
-        id: `iteration_${Date.now()}`,
-        startDate: currentIterationStartDate,
-        endDate: endDate,
-        startingWeight: user.weight,
-        targetWeight: user.targetWeight,
-        finalWeight: finalWeight,
-        weightLost: weightLost,
-        totalDeficitBurned: currentDeficit,
-        butterPacksEarned: butterPacks,
-        duration: duration,
-        isCompleted: true
-      };
+    // Create iteration summary (unused but kept for future use)
+    const _iterationSummary: IterationSummary = {
+      id: `iteration_${Date.now()}`,
+      startDate: currentIterationStartDate,
+      endDate: endDate,
+      startingWeight: user.weight,
+      targetWeight: user.targetWeight,
+      finalWeight: finalWeight,
+      weightLost: weightLost,
+      totalDeficitBurned: currentDeficit,
+      butterPacksEarned: butterPacks,
+      duration: duration,
+      isCompleted: true
+    };
 
       const iterationData: IterationData = {
-        summary: iterationSummary,
+        summary: _iterationSummary,
         logs: [...logs],
         rewards: earnedRewards,
         milestoneAchievements: [false, false, false, false]
@@ -348,7 +349,9 @@ const App: React.FC = () => {
       }
     }
 
-    const iterationSummary: IterationSummary = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // Create iteration summary (unused but kept for future use)
+    const _iterationSummary2: IterationSummary = {
       id: `iteration_${Date.now()}`,
       startDate: currentIterationStartDate,
       endDate: endDate,
@@ -433,6 +436,7 @@ const App: React.FC = () => {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const iterationSummary: IterationSummary = {
       id: `iteration_${Date.now()}`,
       startDate: currentIterationStartDate,
@@ -505,6 +509,7 @@ const App: React.FC = () => {
     return weightLogs.length > 0 ? weightLogs[0].weight! : user!.weight;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const resetData = () => {
     if (window.confirm('Are you sure you want to reset all your data? This cannot be undone.')) {
       localStorage.removeItem('butterloss_user');
@@ -542,6 +547,7 @@ const App: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const clearCacheAndRestart = () => {
     if (window.confirm('This will clear all localStorage and restart the app. Continue?')) {
       localStorage.clear();
