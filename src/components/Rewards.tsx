@@ -29,7 +29,7 @@ const Rewards: React.FC<RewardsProps> = ({ data, onUpdateRewards }) => {
   const totalDeficitNeeded = data.totalDeficitNeeded;
   const currentDeficit = data.currentDeficit;
   const progressPercentage = totalDeficitNeeded > 0 
-    ? Math.min((currentDeficit / totalDeficitNeeded) * 100, 100)
+    ? Math.max(0, Math.min(100, (currentDeficit / totalDeficitNeeded) * 100))
     : 0;
   
   const milestones = useMemo(() => [
@@ -187,7 +187,7 @@ const Rewards: React.FC<RewardsProps> = ({ data, onUpdateRewards }) => {
       progressInSlice = sliceSize;
     } else if (currentDeficit > sliceStart) {
       // Milestone is in progress - show partial slice
-      progressInSlice = currentDeficit - sliceStart;
+      progressInSlice = Math.max(0, currentDeficit - sliceStart);
     } else {
       // Milestone hasn't started - show 0
       progressInSlice = 0;
@@ -196,7 +196,7 @@ const Rewards: React.FC<RewardsProps> = ({ data, onUpdateRewards }) => {
     return {
       current: progressInSlice,
       target: sliceSize,
-      percentage: sliceSize > 0 ? Math.min((progressInSlice / sliceSize) * 100, 100) : 0
+      percentage: sliceSize > 0 ? Math.max(0, Math.min(100, (progressInSlice / sliceSize) * 100)) : 0
     };
   };
 

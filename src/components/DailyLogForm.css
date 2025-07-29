@@ -106,6 +106,10 @@
   font-weight: 700;
 }
 
+.confirmation-text strong.negative-calories {
+  color: #dc3545;
+}
+
 .confirmation-actions {
   display: flex;
   gap: 10px;

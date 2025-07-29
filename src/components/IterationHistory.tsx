@@ -15,7 +15,7 @@ const IterationHistory: React.FC<IterationHistoryProps> = ({ iterations, onViewD
         <div className="empty-history">
           <div className="empty-icon">📊</div>
           <h3>No Previous Iterations</h3>
-          <p>Complete your first weight loss goal to see your iteration history here.</p>
+          <p>Complete your first calorie deficit goal to see your iteration history here.</p>
         </div>
       </div>
     );

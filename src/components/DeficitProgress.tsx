@@ -8,7 +8,7 @@ interface DeficitProgressProps {
 
 const DeficitProgress: React.FC<DeficitProgressProps> = ({ data }) => {
   const progressPercentage = data.totalDeficitNeeded > 0 
-    ? (data.currentDeficit / data.totalDeficitNeeded) * 100 
+    ? Math.max(0, Math.min(100, (data.currentDeficit / data.totalDeficitNeeded) * 100))
     : 0;
 
   return (

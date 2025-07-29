@@ -88,7 +88,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
           <div className="confirmation-message">
             <div className="confirmation-icon">🧈</div>
             <div className="confirmation-text">
-              <p>You've logged <strong>{loggedDeficit}</strong> calories for today.</p>
+              <p>You've logged <strong className={loggedDeficit && loggedDeficit < 0 ? 'negative-calories' : ''}>{loggedDeficit}</strong> calories for today.</p>
               <p>Come back tomorrow to keep the streak going! 🔥</p>
             </div>
           </div>
