@@ -12,6 +12,7 @@ import IterationSetup from './components/IterationSetup';
 import IterationHistory from './components/IterationHistory';
 import IterationDetails from './components/IterationDetails';
 import WeightInputModal from './components/WeightInputModal';
+import Footer from './components/Footer';
 import { 
   calculateTotalDeficitNeeded, 
   calculateCurrentDeficit, 
@@ -759,6 +760,8 @@ const App: React.FC = () => {
           onSkip={handleWeightInputSkip}
         />
       )}
+      
+      <Footer />
     </div>
   );
 };
