@@ -665,7 +665,10 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🧈 ButterLoss</h1>
+        <h1>
+          <img src="/butter-logo.png" alt="ButterLoss" style={{ width: '40px', height: '40px', verticalAlign: 'middle', marginRight: '10px' }} />
+          ButterLoss
+        </h1>
         <nav className="nav-tabs">
           <button 
             className={`nav-tab ${currentView === 'dashboard' ? 'active' : ''}`}
