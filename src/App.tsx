@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [selectedIteration, setSelectedIteration] = useState<IterationData | null>(null);
   const [resetFlag, setResetFlag] = useState(0);
   const [iterationCompletedToday, setIterationCompletedToday] = useState(false);
+  const [previousRemainingDeficit, setPreviousRemainingDeficit] = useState<number | null>(null);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -152,14 +153,22 @@ const App: React.FC = () => {
     if (user && logs.length > 0) {
       const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
       const currentDeficit = calculateCurrentDeficit(logs);
+      const remainingDeficit = totalDeficitNeeded - currentDeficit;
       
-      // Check if goal is completed and weight input modal is not already shown
-      if (currentDeficit >= totalDeficitNeeded && !showWeightInput && !showIterationSetup && !goalCompletedHandled) {
-        console.log('🎉 Goal completed! Auto-triggering weight input modal');
+      // Check if remaining deficit crossed from positive to zero/negative
+      const wasPositive = previousRemainingDeficit !== null && previousRemainingDeficit > 0;
+      const isNowZeroOrNegative = remainingDeficit <= 0;
+      
+      if (wasPositive && isNowZeroOrNegative && !showWeightInput && !showIterationSetup && !goalCompletedHandled) {
+        console.log('🎉 Goal completed! Remaining deficit crossed from positive to zero/negative');
+        console.log('Previous remaining deficit:', previousRemainingDeficit, 'Current remaining deficit:', remainingDeficit);
         setShowWeightInput(true);
       }
+      
+      // Update previous remaining deficit for next comparison
+      setPreviousRemainingDeficit(remainingDeficit);
     }
-  }, [logs, user, showWeightInput, showIterationSetup, goalCompletedHandled]);
+  }, [logs, user, showWeightInput, showIterationSetup, goalCompletedHandled, previousRemainingDeficit]);
 
   const handleUserSetup = (newUser: User) => {
     console.log('Setting up new user:', newUser);
@@ -503,6 +512,7 @@ const App: React.FC = () => {
     setCurrentIterationStartDate(getCurrentDate());
     setGoalCompletedHandled(false);
     setIterationCompletedToday(false);
+    setPreviousRemainingDeficit(null);
     
     // Clear localStorage for current iteration
     localStorage.removeItem('butterloss_logs');
@@ -611,6 +621,7 @@ const App: React.FC = () => {
       setSelectedIteration(null);
       setGoalCompletedHandled(false);
       setIterationCompletedToday(false);
+      setPreviousRemainingDeficit(null);
       setResetFlag(prev => prev + 1);
       setCurrentView('setup');
       

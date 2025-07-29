@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DailyLog } from '../types';
 import { format } from 'date-fns';
 import './DailyLogForm.css';
@@ -15,6 +15,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
+  const deficitInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when todayLog changes (e.g., after restart journey)
   useEffect(() => {
@@ -52,6 +53,10 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
 
   const handleEdit = () => {
     setShowConfirmation(false);
+    // Focus on the deficit input field after a short delay to ensure the form is rendered
+    setTimeout(() => {
+      deficitInputRef.current?.focus();
+    }, 100);
   };
 
   return (
@@ -63,6 +68,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
           <div className="form-group">
             <label htmlFor="deficit">Calorie Deficit</label>
             <input
+              ref={deficitInputRef}
               type="number"
               id="deficit"
               value={deficit}
