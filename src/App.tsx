@@ -689,7 +689,11 @@ const App: React.FC = () => {
 
         {currentView === 'dashboard' && (
           <div className="dashboard">
-            <DailyLogForm onLogSubmit={handleLogSubmit} currentWeight={currentWeight} />
+            <DailyLogForm 
+              onLogSubmit={handleLogSubmit} 
+              currentWeight={currentWeight} 
+              todayLog={logs.find(log => log.date === getCurrentDate())}
+            />
             <DeficitProgress data={weightLossData} />
             <EstimatedCompletion data={weightLossData} onUpdateDailyGoal={handleUpdateDailyGoal} />
             <TipsForSuccess />

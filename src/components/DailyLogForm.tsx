@@ -6,12 +6,13 @@ import './DailyLogForm.css';
 interface DailyLogFormProps {
   onLogSubmit: (log: DailyLog) => void;
   currentWeight: number;
+  todayLog?: DailyLog | null;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog }) => {
   const [deficit, setDeficit] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [loggedDeficit, setLoggedDeficit] = useState<number | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
+  const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
