@@ -34,6 +34,8 @@ const App: React.FC = () => {
   const [iterations, setIterations] = useState<IterationData[]>([]);
   const [currentIterationStartDate, setCurrentIterationStartDate] = useState<string>('');
   const [selectedIteration, setSelectedIteration] = useState<IterationData | null>(null);
+  const [resetFlag, setResetFlag] = useState(0);
+  const [iterationCompletedToday, setIterationCompletedToday] = useState(false);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -231,6 +233,13 @@ const App: React.FC = () => {
 
   const handleStartNewIteration = () => {
     if (!user) return;
+    
+    // Check if iteration was completed today
+    if (iterationCompletedToday) {
+      alert('🎉 Congratulations on completing your iteration today! Please start your new iteration tomorrow to give yourself time to celebrate this achievement. 🌟');
+      return;
+    }
+    
     console.log('🔄 Starting new iteration setup');
     
     // If goal was completed, create iteration summary from current data
@@ -374,6 +383,7 @@ const App: React.FC = () => {
     // Don't add to iterations yet - only when user starts new iteration
     setShowWeightInput(false);
     setGoalCompletedHandled(true);
+    setIterationCompletedToday(true);
     // Don't automatically start new iteration - let user decide when to start
   };
 
@@ -461,6 +471,7 @@ const App: React.FC = () => {
     // Don't add to iterations yet - only when user starts new iteration
     setShowWeightInput(false);
     setGoalCompletedHandled(true);
+    setIterationCompletedToday(true);
     // Don't automatically start new iteration - let user decide when to start
   };
 
@@ -491,6 +502,7 @@ const App: React.FC = () => {
     setLogs([weightLogEntry]);
     setCurrentIterationStartDate(getCurrentDate());
     setGoalCompletedHandled(false);
+    setIterationCompletedToday(false);
     
     // Clear localStorage for current iteration
     localStorage.removeItem('butterloss_logs');
@@ -552,6 +564,7 @@ const App: React.FC = () => {
       setCurrentIterationStartDate(today);
       // Reset goal completion flag
       setGoalCompletedHandled(false);
+      setResetFlag(prev => prev + 1);
       // Clear localStorage for current iteration
       localStorage.removeItem('butterloss_logs');
       localStorage.removeItem('butterloss_rewards');
@@ -597,6 +610,8 @@ const App: React.FC = () => {
       setShowIterationSetup(false);
       setSelectedIteration(null);
       setGoalCompletedHandled(false);
+      setIterationCompletedToday(false);
+      setResetFlag(prev => prev + 1);
       setCurrentView('setup');
       
       console.log('🔄 Journey restarted successfully');
@@ -641,6 +656,11 @@ const App: React.FC = () => {
     gheePacks,
     currentStreak
   };
+
+  // Debug logging
+  const todayLog = logs.find(log => log.date === getCurrentDate());
+  console.log('App - logs length:', logs.length, 'todayLog:', todayLog, 'getCurrentDate():', getCurrentDate());
+  console.log('App - all logs:', logs);
 
   return (
     <div className="app">
@@ -690,9 +710,12 @@ const App: React.FC = () => {
         {currentView === 'dashboard' && (
           <div className="dashboard">
             <DailyLogForm 
+              key={`daily-log-${logs.length}-${resetFlag}`}
               onLogSubmit={handleLogSubmit} 
               currentWeight={currentWeight} 
-              todayLog={logs.find(log => log.date === getCurrentDate())}
+              todayLog={todayLog}
+              logsLength={logs.length}
+              resetFlag={resetFlag}
             />
             <DeficitProgress data={weightLossData} />
             <EstimatedCompletion data={weightLossData} onUpdateDailyGoal={handleUpdateDailyGoal} />

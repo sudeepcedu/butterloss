@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DailyLog } from '../types';
 import { format } from 'date-fns';
 import './DailyLogForm.css';
@@ -7,12 +7,34 @@ interface DailyLogFormProps {
   onLogSubmit: (log: DailyLog) => void;
   currentWeight: number;
   todayLog?: DailyLog | null;
+  logsLength?: number;
+  resetFlag?: number;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0 }) => {
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
+
+  // Reset state when todayLog changes (e.g., after restart journey)
+  useEffect(() => {
+    console.log('DailyLogForm useEffect - todayLog:', todayLog, 'logsLength:', logsLength, 'resetFlag:', resetFlag);
+    
+    // Only show confirmation if there's a valid log for today
+    const hasValidLog = todayLog && todayLog.deficit !== null && todayLog.deficit !== undefined;
+    console.log('Has valid log for today:', hasValidLog);
+    
+    if (hasValidLog) {
+      console.log('Setting confirmation to true with deficit:', todayLog.deficit);
+      setShowConfirmation(true);
+      setLoggedDeficit(todayLog.deficit);
+    } else {
+      console.log('Setting confirmation to false - no valid log');
+      setShowConfirmation(false);
+      setLoggedDeficit(null);
+    }
+    setDeficit('');
+  }, [todayLog, logsLength, resetFlag]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
