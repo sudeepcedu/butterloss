@@ -12,6 +12,7 @@ import IterationSetup from './components/IterationSetup';
 import IterationHistory from './components/IterationHistory';
 import IterationDetails from './components/IterationDetails';
 import WeightInputModal from './components/WeightInputModal';
+import ResetIterationModal from './components/ResetIterationModal';
 import Footer from './components/Footer';
 import { 
   calculateTotalDeficitNeeded, 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'setup' | 'dashboard' | 'calendar' | 'butter' | 'weight' | 'rewards'>('setup');
   const [showIterationSetup, setShowIterationSetup] = useState(false);
   const [showWeightInput, setShowWeightInput] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const [goalCompletedHandled, setGoalCompletedHandled] = useState(false);
   const [iterations, setIterations] = useState<IterationData[]>([]);
   const [currentIterationStartDate, setCurrentIterationStartDate] = useState<string>('');
@@ -37,6 +39,7 @@ const App: React.FC = () => {
   const [resetFlag, setResetFlag] = useState(0);
   const [iterationCompletedToday, setIterationCompletedToday] = useState(false);
   const [previousRemainingDeficit, setPreviousRemainingDeficit] = useState<number | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -47,7 +50,8 @@ const App: React.FC = () => {
       console.log('Preventing user reset to null - user already exists');
       return;
     }
-    console.log('Setting user safely:', newUser);
+    console.log('🔄 setUserSafely called with:', newUser);
+    console.log('🔄 Current user before update:', user);
     setUser(newUser);
   }, [user]);
 
@@ -60,16 +64,23 @@ const App: React.FC = () => {
   }, [showWeightInput]);
 
   useEffect(() => {
+    // Skip loading if we're in the middle of a reset operation
+    if (isResetting) {
+      console.log('Skipping localStorage load during reset operation');
+      return;
+    }
+    
     const savedUser = localStorage.getItem('butterloss_user');
     const savedLogs = localStorage.getItem('butterloss_logs');
     const savedIterations = localStorage.getItem('butterloss_iterations');
     const savedIterationStartDate = localStorage.getItem('butterloss_iteration_start_date');
     
-    console.log('Loading from localStorage:', { 
+    console.log('🔄 Loading from localStorage:', { 
       savedUser: savedUser ? JSON.parse(savedUser) : null, 
       savedLogs: savedLogs ? JSON.parse(savedLogs) : null, 
       savedIterations, 
-      savedIterationStartDate 
+      savedIterationStartDate,
+      isResetting
     });
     
     try {
@@ -112,9 +123,15 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('Error loading from localStorage:', error);
     }
-  }, []);
+  }, [isResetting]);
 
   useEffect(() => {
+    // Skip saving if we're in the middle of a reset operation
+    if (isResetting) {
+      console.log('Skipping localStorage save during reset operation');
+      return;
+    }
+    
     console.log('Saving to localStorage:', { user, logs, iterations, currentIterationStartDate });
     try {
       // Only save user if it's not null and actually exists
@@ -138,11 +155,34 @@ const App: React.FC = () => {
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
-  }, [user, logs, iterations, currentIterationStartDate, setUserSafely]);
+  }, [user, logs, iterations, currentIterationStartDate, setUserSafely, isResetting]);
 
   useEffect(() => {
-    console.log('User state changed:', user);
-  }, [user]);
+    console.log('🔄 User state changed:', user);
+    if (user) {
+      console.log('🔄 User weight:', user.weight, 'User targetWeight:', user.targetWeight, 'User targetLoss:', user.targetLoss);
+      
+      // Calculate and log deficit info when user changes
+      const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
+      const currentDeficit = calculateCurrentDeficit(logs);
+      const remainingDeficit = calculateRemainingDeficit(totalDeficitNeeded, currentDeficit);
+      console.log('🔄 Deficit calculations after user update:', {
+        totalDeficitNeeded,
+        currentDeficit,
+        remainingDeficit,
+        targetLoss: user.targetLoss
+      });
+    }
+  }, [user, logs]);
+
+  // Force re-render when target weight changes
+  useEffect(() => {
+    if (user) {
+      console.log('🔄 Target weight changed to:', user.targetWeight);
+      // Force a re-render by updating reset flag
+      setResetFlag(prev => prev + 1);
+    }
+  }, [user?.targetWeight]);
 
   useEffect(() => {
     console.log('Logs state changed:', logs);
@@ -558,37 +598,101 @@ const App: React.FC = () => {
   };
 
   const resetIteration = () => {
-    if (window.confirm('Are you sure you want to reset the current iteration? This will remove all calorie deficit entries and weight log entries from the current iteration. This cannot be undone.')) {
-      // Find the initial weight log (the first weight entry from the current iteration)
-      const initialWeightLog = logs.find(log => 
-        log.weight !== null && 
-        new Date(log.date) >= new Date(currentIterationStartDate)
-      );
-      
-      // Clear all logs but preserve the initial weight if it exists
-      const preservedLogs = initialWeightLog ? [initialWeightLog] : [];
-      setLogs(preservedLogs);
-      
-      // Reset iteration start date to today
-      const today = new Date().toISOString().split('T')[0];
-      setCurrentIterationStartDate(today);
-      // Reset goal completion flag
-      setGoalCompletedHandled(false);
-      setResetFlag(prev => prev + 1);
-      // Clear localStorage for current iteration
-      localStorage.removeItem('butterloss_logs');
-      localStorage.removeItem('butterloss_rewards');
-      for (let i = 0; i < 4; i++) {
-        localStorage.removeItem(`milestone_${i}_achieved`);
-      }
-      console.log('🔄 Current iteration reset successfully');
+    setShowResetModal(true);
+  };
+
+  const handleResetIteration = (currentWeight: number, targetWeight: number) => {
+    console.log('🔄 Starting reset iteration with current weight:', currentWeight, 'target weight:', targetWeight);
+    console.log('🔄 Current logs before reset:', logs);
+    console.log('🔄 Current localStorage before reset:', {
+      logs: localStorage.getItem('butterloss_logs'),
+      rewards: localStorage.getItem('butterloss_rewards'),
+      iterationStartDate: localStorage.getItem('butterloss_iteration_start_date')
+    });
+    
+    // Set reset flag to prevent localStorage saving during reset
+    setIsResetting(true);
+    
+    // Create a new weight log for today with the current weight
+    const today = getCurrentDate();
+    const newWeightLog: DailyLog = {
+      date: today,
+      deficit: null,
+      weight: currentWeight
+    };
+    
+    // Calculate new target loss based on new weights
+    const newTargetLoss = currentWeight - targetWeight;
+    console.log('🔄 New target loss calculated:', newTargetLoss, 'kg');
+    
+    // Update user with new weights and target loss
+    const updatedUser = {
+      ...user!,
+      weight: currentWeight,
+      targetWeight: targetWeight,
+      targetLoss: newTargetLoss
+    };
+    console.log('🔄 Updating user with new data:', updatedUser);
+    
+    // Force immediate user update
+    setUser(updatedUser);
+    
+    // Also try setUserSafely as backup
+    setUserSafely(updatedUser);
+    
+    // Set logs to only contain the new weight log
+    console.log('🔄 Resetting iteration - new weight log:', newWeightLog);
+    setLogs([newWeightLog]);
+    
+    // Reset iteration start date to today
+    console.log('🔄 Setting new iteration start date:', today);
+    setCurrentIterationStartDate(today);
+    
+    // Calculate new total deficit needed for debugging
+    const newTotalDeficitNeeded = calculateTotalDeficitNeeded(newTargetLoss);
+    console.log('🔄 New total deficit needed:', newTotalDeficitNeeded, 'calories');
+    
+    // Reset goal completion flag
+    setGoalCompletedHandled(false);
+    setResetFlag(prev => prev + 1);
+    
+    // Clear localStorage for current iteration
+    localStorage.removeItem('butterloss_logs');
+    localStorage.removeItem('butterloss_rewards');
+    localStorage.removeItem('butterloss_iteration_start_date');
+    for (let i = 0; i < 4; i++) {
+      localStorage.removeItem(`milestone_${i}_achieved`);
     }
+    
+    console.log('🔄 localStorage after clearing:', {
+      logs: localStorage.getItem('butterloss_logs'),
+      rewards: localStorage.getItem('butterloss_rewards'),
+      iterationStartDate: localStorage.getItem('butterloss_iteration_start_date')
+    });
+    
+    // Immediately save the updated user to localStorage
+    localStorage.setItem('butterloss_user', JSON.stringify(updatedUser));
+    console.log('🔄 Immediately saved updated user to localStorage');
+    
+    // Re-enable localStorage saving after a short delay
+    setTimeout(() => {
+      setIsResetting(false);
+      console.log('🔄 Reset operation completed, localStorage saving re-enabled');
+    }, 100);
+    
+    // Close the modal
+    setShowResetModal(false);
+    
+    console.log('🔄 Current iteration reset successfully');
   };
 
   const restartJourney = () => {
     if (!user) return;
     
     if (window.confirm('Are you sure you want to restart your journey? This will clear all current progress and take you back to the welcome screen.')) {
+      // Set reset flag to prevent localStorage saving during restart
+      setIsResetting(true);
+      
       // Save current user info for pre-filling
       const userInfo = {
         name: user.name,
@@ -625,6 +729,12 @@ const App: React.FC = () => {
       setResetFlag(prev => prev + 1);
       setCurrentView('setup');
       
+      // Re-enable localStorage saving after a short delay
+      setTimeout(() => {
+        setIsResetting(false);
+        console.log('🔄 Journey restart completed, localStorage saving re-enabled');
+      }, 100);
+      
       console.log('🔄 Journey restarted successfully');
     }
   };
@@ -649,6 +759,9 @@ const App: React.FC = () => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   const currentWeight = weightLogs.length > 0 ? weightLogs[0].weight! : user.weight;
+  
+  console.log('🔄 Dashboard - currentWeight:', currentWeight, 'user.weight:', user.weight, 'user.targetWeight:', user.targetWeight);
+  console.log('🔄 Dashboard - weightLogs:', weightLogs);
 
   const totalDeficitNeeded = calculateTotalDeficitNeeded(user.targetLoss);
   const currentDeficit = calculateCurrentDeficit(logs);
@@ -716,7 +829,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="app-main">
-        <div className="user-info">
+        <div className="user-info" key={`user-info-${user.weight}-${user.targetWeight}-${user.targetLoss}-${resetFlag}`}>
           <h2>Welcome back, {user.name}! 👋</h2>
           <p>Current Weight: {currentWeight} kg | Target: {user.targetWeight} kg</p>
         </div>
@@ -799,6 +912,16 @@ const App: React.FC = () => {
           lastLoggedWeight={getCurrentWeight()}
           onComplete={handleWeightInputComplete}
           onSkip={handleWeightInputSkip}
+        />
+      )}
+
+      {showResetModal && (
+        <ResetIterationModal
+          isOpen={showResetModal}
+          onClose={() => setShowResetModal(false)}
+          onReset={handleResetIteration}
+          lastLoggedWeight={getCurrentWeight()}
+          previousTargetWeight={user.targetWeight}
         />
       )}
       

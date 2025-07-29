@@ -79,11 +79,22 @@
 }
 
 .clear-cache-btn {
-  background: #4ecdc4;
+  background: linear-gradient(135deg, #4ecdc4, #45b7aa);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
 }
 
 .clear-cache-btn:hover {
-  background: #45b7aa;
+  background: linear-gradient(135deg, #45b7aa, #3da89b);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
 }
 
 .complete-iteration-btn {
