@@ -100,6 +100,19 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     }
   };
 
+  const handleExerciseBlur = () => {
+    console.log('🔄 DailyBurnTracker - Exercise blur, recalculating deficit:', {
+      sedentaryCalories,
+      exerciseCalories: exerciseCaloriesNum,
+      foodCalories: foodCaloriesNum,
+      totalBurn,
+      deficit
+    });
+    if (onAutoFillDeficit) {
+      onAutoFillDeficit(deficit);
+    }
+  };
+
   const handleFoodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('Food change:', e.target.value);
     setFoodCalories(e.target.value);
@@ -122,6 +135,19 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     }
   };
 
+  const handleFoodBlur = () => {
+    console.log('🔄 DailyBurnTracker - Food blur, recalculating deficit:', {
+      sedentaryCalories,
+      exerciseCalories: exerciseCaloriesNum,
+      foodCalories: foodCaloriesNum,
+      totalBurn,
+      deficit
+    });
+    if (onAutoFillDeficit) {
+      onAutoFillDeficit(deficit);
+    }
+  };
+
   return (
     <div className="daily-burn-tracker">
       <div className="burn-summary">
@@ -134,6 +160,7 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
           value={exerciseCalories}
           onChange={handleExerciseChange}
           onKeyPress={handleExerciseKeyPress}
+          onBlur={handleExerciseBlur}
           pattern="[0-9]*"
           inputMode="numeric"
         />
@@ -150,6 +177,7 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
           value={foodCalories}
           onChange={handleFoodChange}
           onKeyPress={handleFoodKeyPress}
+          onBlur={handleFoodBlur}
           pattern="[0-9]*"
           inputMode="numeric"
         />

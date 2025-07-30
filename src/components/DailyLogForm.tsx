@@ -126,6 +126,13 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     setShowConfirmation(true);
   };
 
+  const handleDeficitBlur = () => {
+    const deficitValue = parseInt(deficit);
+    if (!isNaN(deficitValue) && onDeficitInputChange) {
+      onDeficitInputChange(deficitValue);
+    }
+  };
+
   const handleEdit = () => {
     setShowConfirmation(false);
     // Restore the previously entered deficit value
@@ -154,6 +161,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
               id="deficit"
               value={deficit}
               onChange={(e) => setDeficit(e.target.value)}
+              onBlur={handleDeficitBlur}
               required
               placeholder="Enter today's deficit"
             />
