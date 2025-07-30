@@ -148,4 +148,4 @@ If you have any questions or need help, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ for your weight loss journey** 
+**Made with ❤️ for your weight loss journey** # Netlify deployment trigger
