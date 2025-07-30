@@ -1,0 +1,70 @@
+.daily-burn-tracker {
+  margin: 0;
+  padding: 0;
+}
+
+.daily-burn-tracker p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.inline-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  padding: 2px 4px;
+  margin: 0 2px;
+  font-size: 1.1rem;
+  color: #333;
+  width: 80px; /* Increased width for 5 digits */
+  text-align: center;
+  transition: border-color 0.2s ease;
+  /* Remove spinner buttons for number inputs */
+  -moz-appearance: textfield;
+}
+
+.inline-input::-webkit-outer-spin-button,
+.inline-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inline-input:focus {
+  outline: none;
+  border-bottom-color: #667eea;
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.inline-input:hover {
+  border-bottom-color: #999;
+}
+
+.exercise-input {
+  color: #27ae60;
+  font-weight: 500;
+}
+
+.food-input {
+  color: #27ae60;
+  font-weight: 500;
+}
+
+.total-calories {
+  font-weight: bold;
+  font-style: italic;
+  color: #27ae60;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .daily-burn-tracker p {
+    font-size: 1rem;
+  }
+  
+  .inline-input {
+    width: 40px;
+    font-size: 1rem;
+  }
+} 

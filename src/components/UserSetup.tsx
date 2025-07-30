@@ -17,6 +17,7 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
           name: parsedInfo.name || '',
           age: parsedInfo.age?.toString() || '',
           height: parsedInfo.height?.toString() || '',
+          sex: parsedInfo.sex || 'male',
           weight: '',
           targetWeight: '',
           dailyDeficitGoal: '500'
@@ -29,6 +30,7 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
       name: '',
       age: '',
       height: '',
+      sex: 'male',
       weight: '',
       targetWeight: '',
       dailyDeficitGoal: '500'
@@ -46,7 +48,7 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
     }
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -60,6 +62,7 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
       name: formData.name,
       age: parseInt(formData.age),
       height: parseFloat(formData.height),
+      sex: formData.sex as 'male' | 'female',
       weight: parseFloat(formData.weight),
       targetWeight: parseFloat(formData.targetWeight),
       targetLoss: parseFloat(formData.weight) - parseFloat(formData.targetWeight),
@@ -116,6 +119,20 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
               max="250"
               placeholder="Enter your height in cm"
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="sex">Sex</label>
+            <select
+              id="sex"
+              name="sex"
+              value={formData.sex}
+              onChange={handleChange}
+              required
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
           </div>
 
           <div className="form-group">

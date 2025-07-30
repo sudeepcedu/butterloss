@@ -9,9 +9,11 @@ interface DailyLogFormProps {
   todayLog?: DailyLog | null;
   logsLength?: number;
   resetFlag?: number;
+  autoFillDeficit?: number | null;
+  onDeficitChange?: (deficit: number | null) => void;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0 }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, onDeficitChange }) => {
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
@@ -37,9 +39,49 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     setDeficit('');
   }, [todayLog, logsLength, resetFlag]);
 
+  // Handle auto-fill deficit
+  useEffect(() => {
+    if (autoFillDeficit !== null && autoFillDeficit !== undefined) {
+      setDeficit(autoFillDeficit.toString());
+      setShowConfirmation(false);
+      // Focus on the deficit input field
+      setTimeout(() => {
+        deficitInputRef.current?.focus();
+        // Auto-submit after autofill
+        if (deficitInputRef.current && autoFillDeficit !== null && autoFillDeficit !== undefined && !isNaN(autoFillDeficit)) {
+          // Auto-submit using the autoFillDeficit value directly
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const log: DailyLog = {
+            date: today,
+            deficit: autoFillDeficit,
+            weight: null
+          };
+          onLogSubmit(log);
+          setLoggedDeficit(autoFillDeficit);
+          setShowConfirmation(true);
+        }
+      }, 100);
+    }
+  }, [autoFillDeficit, onLogSubmit]);
+
+  // Notify parent when deficit changes
+  useEffect(() => {
+    if (onDeficitChange) {
+      const deficitValue = deficit ? parseInt(deficit) : null;
+      onDeficitChange(deficitValue);
+    }
+  }, [deficit, onDeficitChange]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const deficitValue = parseInt(deficit);
+    
+    // Validate that we have a valid number
+    if (isNaN(deficitValue)) {
+      console.error('Invalid deficit value:', deficit);
+      return;
+    }
+    
     const today = format(new Date(), 'yyyy-MM-dd');
     const log: DailyLog = {
       date: today,
@@ -53,6 +95,10 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
 
   const handleEdit = () => {
     setShowConfirmation(false);
+    // Restore the previously entered deficit value
+    if (loggedDeficit !== null) {
+      setDeficit(loggedDeficit.toString());
+    }
     // Focus on the deficit input field after a short delay to ensure the form is rendered
     setTimeout(() => {
       deficitInputRef.current?.focus();
@@ -88,7 +134,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
           <div className="confirmation-message">
             <div className="confirmation-icon">🧈</div>
             <div className="confirmation-text">
-              <p>You've logged <strong className={loggedDeficit && loggedDeficit < 0 ? 'negative-calories' : ''}>{loggedDeficit}</strong> calories for today.</p>
+              <p>You've logged <strong className={loggedDeficit && loggedDeficit < 0 ? 'negative-calories' : ''}>{loggedDeficit}</strong> calories deficit for today.</p>
               <p>Come back tomorrow to keep the streak going! 🔥</p>
             </div>
           </div>

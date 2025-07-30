@@ -201,6 +201,16 @@
   margin-bottom: 20px;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.date-display {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .user-info h2 {

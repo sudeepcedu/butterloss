@@ -105,4 +105,19 @@ export const getBMICategory = (bmi: number): string => {
   if (bmi < 25) return 'Normal weight';
   if (bmi < 30) return 'Overweight';
   return 'Obese';
+};
+
+// BMR calculation using Mifflin-St Jeor equation
+export const calculateBMR = (weight: number, height: number, age: number, sex: 'male' | 'female'): number => {
+  if (sex === 'male') {
+    return 10 * weight + 6.25 * height - 5 * age + 5;
+  } else {
+    return 10 * weight + 6.25 * height - 5 * age - 161;
+  }
+};
+
+// TDEE calculation (sedentary multiplier = 1.2)
+export const calculateTDEE = (weight: number, height: number, age: number, sex: 'male' | 'female'): number => {
+  const bmr = calculateBMR(weight, height, age, sex);
+  return Math.round(bmr * 1.2);
 }; 

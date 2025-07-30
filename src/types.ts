@@ -6,6 +6,7 @@ export interface User {
   targetWeight: number; // in kg
   targetLoss: number; // in kg
   dailyDeficitGoal: number; // calories
+  sex: 'male' | 'female'; // for BMR calculation
 }
 
 export interface DailyLog {

@@ -13,6 +13,7 @@ import IterationHistory from './components/IterationHistory';
 import IterationDetails from './components/IterationDetails';
 import WeightInputModal from './components/WeightInputModal';
 import ResetIterationModal from './components/ResetIterationModal';
+import DailyBurnTracker from './components/DailyBurnTracker';
 import Footer from './components/Footer';
 import { 
   calculateTotalDeficitNeeded, 
@@ -20,7 +21,8 @@ import {
   calculateRemainingDeficit, 
   calculateButterPacks,
   calculateGheePacks, 
-  calculateCurrentStreak 
+  calculateCurrentStreak,
+  calculateTDEE
 } from './utils/calculations';
 import { User, DailyLog, WeightLossData, IterationData, IterationSummary } from './types';
 import './App.css';
@@ -40,9 +42,19 @@ const App: React.FC = () => {
   const [iterationCompletedToday, setIterationCompletedToday] = useState(false);
   const [previousRemainingDeficit, setPreviousRemainingDeficit] = useState<number | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [autoFillDeficit, setAutoFillDeficit] = useState<number | null>(null);
+  const [currentDeficitInput, setCurrentDeficitInput] = useState<number | null>(null);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
+  
+  const getFormattedDate = () => {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.toLocaleDateString('en-US', { month: 'long' });
+    const year = today.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
 
   // Custom setUser function to prevent accidental null resets
   const setUserSafely = useCallback((newUser: User | null) => {
@@ -174,6 +186,17 @@ const App: React.FC = () => {
       });
     }
   }, [user, logs]);
+
+  // Clear autoFillDeficit after it's been used
+  useEffect(() => {
+    if (autoFillDeficit !== null) {
+      // Clear the auto-fill deficit after a short delay
+      const timer = setTimeout(() => {
+        setAutoFillDeficit(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFillDeficit]);
 
   // Force re-render when target weight changes
   useEffect(() => {
@@ -697,7 +720,8 @@ const App: React.FC = () => {
       const userInfo = {
         name: user.name,
         age: user.age,
-        height: user.height
+        height: user.height,
+        sex: user.sex
       };
       
       // Clear all progress data
@@ -830,8 +854,22 @@ const App: React.FC = () => {
 
       <main className="app-main">
         <div className="user-info" key={`user-info-${user.weight}-${user.targetWeight}-${user.targetLoss}-${resetFlag}`}>
+          <div className="date-display">{getFormattedDate()}</div>
           <h2>Welcome back, {user.name}! 👋</h2>
           <p>Current Weight: {currentWeight} kg | Target: {user.targetWeight} kg</p>
+          <DailyBurnTracker 
+            user={user} 
+            currentWeight={currentWeight}
+            onUpdateDeficit={(deficit) => {
+              console.log('Daily deficit calculated:', deficit);
+              // You can use this deficit value for other calculations if needed
+            }}
+            onAutoFillDeficit={(deficit) => {
+              console.log('Auto-filling deficit:', deficit);
+              setAutoFillDeficit(deficit);
+            }}
+            syncedDeficit={currentDeficitInput}
+          />
         </div>
 
         {currentView === 'dashboard' && (
@@ -843,6 +881,11 @@ const App: React.FC = () => {
               todayLog={todayLog}
               logsLength={logs.length}
               resetFlag={resetFlag}
+              autoFillDeficit={autoFillDeficit}
+              onDeficitChange={(deficit) => {
+                console.log('Deficit input changed:', deficit);
+                setCurrentDeficitInput(deficit);
+              }}
             />
             <DeficitProgress data={weightLossData} />
             <EstimatedCompletion data={weightLossData} onUpdateDailyGoal={handleUpdateDailyGoal} />
