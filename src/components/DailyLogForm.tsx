@@ -11,9 +11,10 @@ interface DailyLogFormProps {
   resetFlag?: number;
   autoFillDeficit?: number | null;
   onDeficitChange?: (deficit: number | null) => void;
+  onDeficitInputChange?: (deficit: number | null) => void;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, onDeficitChange }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, onDeficitChange, onDeficitInputChange }) => {
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
@@ -72,6 +73,33 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     }
   }, [deficit, onDeficitChange]);
 
+
+
+  // Only update deficit input when autoFillDeficit is triggered (Enter key in food field)
+  useEffect(() => {
+    if (autoFillDeficit !== null && autoFillDeficit !== undefined) {
+      setDeficit(autoFillDeficit.toString());
+      setShowConfirmation(false);
+      // Focus on the deficit input field
+      setTimeout(() => {
+        deficitInputRef.current?.focus();
+        // Auto-submit after autofill
+        if (deficitInputRef.current && autoFillDeficit !== null && autoFillDeficit !== undefined && !isNaN(autoFillDeficit)) {
+          // Auto-submit using the autoFillDeficit value directly
+          const today = format(new Date(), 'yyyy-MM-dd');
+          const log: DailyLog = {
+            date: today,
+            deficit: autoFillDeficit,
+            weight: null
+          };
+          onLogSubmit(log);
+          setLoggedDeficit(autoFillDeficit);
+          setShowConfirmation(true);
+        }
+      }, 100);
+    }
+  }, [autoFillDeficit, onLogSubmit]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const deficitValue = parseInt(deficit);
@@ -80,6 +108,11 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     if (isNaN(deficitValue)) {
       console.error('Invalid deficit value:', deficit);
       return;
+    }
+    
+    // Trigger food eaten update when deficit is submitted
+    if (onDeficitInputChange) {
+      onDeficitInputChange(deficitValue);
     }
     
     const today = format(new Date(), 'yyyy-MM-dd');
@@ -104,6 +137,8 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
       deficitInputRef.current?.focus();
     }, 100);
   };
+
+
 
   return (
     <div className="daily-log-form">

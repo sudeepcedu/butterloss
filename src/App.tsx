@@ -44,6 +44,8 @@ const App: React.FC = () => {
   const [isResetting, setIsResetting] = useState(false);
   const [autoFillDeficit, setAutoFillDeficit] = useState<number | null>(null);
   const [currentDeficitInput, setCurrentDeficitInput] = useState<number | null>(null);
+  const [foodEatenForSync, setFoodEatenForSync] = useState<number | null>(null);
+  const [currentExerciseCalories, setCurrentExerciseCalories] = useState<number>(0);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -853,27 +855,32 @@ const App: React.FC = () => {
       </header>
 
       <main className="app-main">
-        <div className="user-info" key={`user-info-${user.weight}-${user.targetWeight}-${user.targetLoss}-${resetFlag}`}>
-          <div className="date-display">{getFormattedDate()}</div>
-          <h2>Welcome back, {user.name}! 👋</h2>
-          <p>Current Weight: {currentWeight} kg | Target: {user.targetWeight} kg</p>
-          <DailyBurnTracker 
-            user={user} 
-            currentWeight={currentWeight}
-            onUpdateDeficit={(deficit) => {
-              console.log('Daily deficit calculated:', deficit);
-              // You can use this deficit value for other calculations if needed
-            }}
-            onAutoFillDeficit={(deficit) => {
-              console.log('Auto-filling deficit:', deficit);
-              setAutoFillDeficit(deficit);
-            }}
-            syncedDeficit={currentDeficitInput}
-          />
-        </div>
-
         {currentView === 'dashboard' && (
           <div className="dashboard">
+            <div className="user-info" key={`user-info-${user.weight}-${user.targetWeight}-${user.targetLoss}-${resetFlag}`}>
+              <div className="date-display">{getFormattedDate()}</div>
+              <h2>Welcome back, {user.name}! 👋</h2>
+              <p>Current Weight: {currentWeight} kg | Target: {user.targetWeight} kg</p>
+              <DailyBurnTracker 
+                user={user} 
+                currentWeight={currentWeight}
+                onUpdateDeficit={(deficit) => {
+                  console.log('Daily deficit calculated:', deficit);
+                  // Only update currentDeficitInput for tracking, don't auto-fill
+                  setCurrentDeficitInput(deficit);
+                }}
+                onAutoFillDeficit={(deficit) => {
+                  console.log('Auto-filling deficit:', deficit);
+                  setAutoFillDeficit(deficit);
+                }}
+                onExerciseChange={(exercise) => {
+                  console.log('Exercise calories updated:', exercise);
+                  setCurrentExerciseCalories(exercise);
+                }}
+                syncedDeficit={currentDeficitInput}
+                syncedFoodEaten={foodEatenForSync}
+              />
+            </div>
             <DailyLogForm 
               key={`daily-log-${logs.length}-${resetFlag}`}
               onLogSubmit={handleLogSubmit} 
@@ -885,6 +892,18 @@ const App: React.FC = () => {
               onDeficitChange={(deficit) => {
                 console.log('Deficit input changed:', deficit);
                 setCurrentDeficitInput(deficit);
+              }}
+              onDeficitInputChange={(deficit) => {
+                console.log('Deficit input change for food sync:', deficit);
+                // Calculate food eaten based on deficit: food = totalBurn - deficit
+                if (deficit !== null && !isNaN(deficit)) {
+                  const sedentaryCalories = calculateTDEE(currentWeight, user.height, user.age, user.sex);
+                  const totalBurn = sedentaryCalories + currentExerciseCalories; // Use actual exercise value
+                  const foodEaten = totalBurn - deficit;
+                  console.log('Calculating food eaten:', { totalBurn, deficit, foodEaten, sedentaryCalories, currentExerciseCalories });
+                  // Update the food eaten in DailyBurnTracker
+                  setFoodEatenForSync(foodEaten);
+                }
               }}
             />
             <DeficitProgress data={weightLossData} />

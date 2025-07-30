@@ -3,11 +3,46 @@
   padding: 0;
 }
 
-.daily-burn-tracker p {
-  margin: 0;
+.burn-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
   font-size: 1.1rem;
   color: #666;
   line-height: 1.4;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.food-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.4;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.burn-label, .food-label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.burn-value, .burn-unit, .food-unit {
+  color: #666;
+  white-space: nowrap;
+}
+
+.burn-separator {
+  color: #999;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .inline-input {
@@ -59,12 +94,35 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .daily-burn-tracker p {
-    font-size: 1rem;
+  .burn-summary, .food-summary {
+    font-size: 0.9rem;
+    gap: 6px;
   }
   
   .inline-input {
-    width: 40px;
-    font-size: 1rem;
+    width: 50px;
+    font-size: 0.9rem;
+    padding: 1px 2px;
+  }
+  
+  .total-calories {
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .burn-summary, .food-summary {
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+  
+  .inline-input {
+    width: 45px;
+    font-size: 0.8rem;
+  }
+  
+  .total-calories {
+    font-size: 0.8rem;
   }
 } 

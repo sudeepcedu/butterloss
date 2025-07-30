@@ -202,6 +202,10 @@
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .date-display {
@@ -221,6 +225,9 @@
 .user-info p {
   color: #666;
   font-size: 1.1rem;
+  margin: 0;
+  text-align: center;
+  width: 100%;
 }
 
 .dashboard, .butter-view, .calendar-view, .weight-view {
@@ -266,14 +273,26 @@
 
   .user-info {
     padding: 15px;
+    position: relative;
+    gap: 10px;
   }
 
   .user-info h2 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
   }
 
   .user-info p {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .date-display {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    font-size: 0.8rem;
   }
 
   .dashboard-actions {
@@ -300,5 +319,50 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .app-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .nav-tabs {
+    gap: 6px;
+  }
+
+  .nav-tab {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    min-height: 40px;
+  }
+
+  .app-main {
+    padding: 10px;
+  }
+
+  .user-info {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .user-info h2 {
+    font-size: 1rem;
+  }
+
+  .user-info p {
+    font-size: 0.85rem;
+  }
+
+  .date-display {
+    top: 8px;
+    left: 12px;
+    font-size: 0.75rem;
   }
 } 
