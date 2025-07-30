@@ -60,8 +60,8 @@ const ButterCollection: React.FC<ButterCollectionProps> = ({ data }) => {
       <div className="collection-tips">
         <h4>💡 Collection Rules</h4>
         <ul>
-          <li>Every 770 calorie deficit = 1 butter pack (100g fat)</li>
-          <li>Every 7700 calorie deficit = 1 premium ghee pack (1kg fat)</li>
+          <li>Every 770 calorie deficit = 1 butter pack (100g weight lost)</li>
+          <li>Every 7700 calorie deficit = 1 premium ghee pack (1kg weight lost)</li>
         </ul>
       </div>
     </div>
