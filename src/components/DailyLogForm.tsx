@@ -10,11 +10,12 @@ interface DailyLogFormProps {
   logsLength?: number;
   resetFlag?: number;
   autoFillDeficit?: number | null;
+  currentDeficitCalculation?: number | null;
   onDeficitChange?: (deficit: number | null) => void;
   onDeficitInputChange?: (deficit: number | null) => void;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, onDeficitChange, onDeficitInputChange }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, currentDeficitCalculation, onDeficitChange, onDeficitInputChange }) => {
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
@@ -72,6 +73,16 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
       onDeficitChange(deficitValue);
     }
   }, [deficit, onDeficitChange]);
+
+  // Update deficit field when calculation changes (but only if user hasn't manually entered a deficit)
+  useEffect(() => {
+    if (currentDeficitCalculation !== null && currentDeficitCalculation !== undefined && !showConfirmation) {
+      // Only update if the deficit field is empty or has the default value
+      if (!deficit || deficit === '0') {
+        setDeficit(currentDeficitCalculation.toString());
+      }
+    }
+  }, [currentDeficitCalculation, showConfirmation]);
 
 
 

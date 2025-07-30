@@ -87,29 +87,33 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
   const handleExerciseKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      console.log('🔄 DailyBurnTracker - Exercise updated, recalculating deficit:', {
+      console.log('🔄 DailyBurnTracker - Exercise updated, updating deficit calculation:', {
         sedentaryCalories,
         exerciseCalories: exerciseCaloriesNum,
         foodCalories: foodCaloriesNum,
         totalBurn,
         deficit
       });
-      if (onAutoFillDeficit) {
-        onAutoFillDeficit(deficit);
+      // Only update deficit calculation, don't auto-log
+      if (onUpdateDeficit) {
+        onUpdateDeficit(deficit);
       }
+      // Remove focus from the input field
+      e.currentTarget.blur();
     }
   };
 
   const handleExerciseBlur = () => {
-    console.log('🔄 DailyBurnTracker - Exercise blur, recalculating deficit:', {
+    console.log('🔄 DailyBurnTracker - Exercise blur, updating deficit calculation:', {
       sedentaryCalories,
       exerciseCalories: exerciseCaloriesNum,
       foodCalories: foodCaloriesNum,
       totalBurn,
       deficit
     });
-    if (onAutoFillDeficit) {
-      onAutoFillDeficit(deficit);
+    // Only update deficit calculation, don't auto-log
+    if (onUpdateDeficit) {
+      onUpdateDeficit(deficit);
     }
   };
 
@@ -132,6 +136,8 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
       if (onAutoFillDeficit) {
         onAutoFillDeficit(deficit);
       }
+      // Remove focus from the input field
+      e.currentTarget.blur();
     }
   };
 

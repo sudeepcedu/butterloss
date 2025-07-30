@@ -689,6 +689,11 @@ const App: React.FC = () => {
       localStorage.removeItem(`milestone_${i}_achieved`);
     }
     
+    // Clear today's exercise and food calories
+    const currentDate = getCurrentDate();
+    localStorage.removeItem(`butterloss_exercise_${currentDate}`);
+    localStorage.removeItem(`butterloss_food_${currentDate}`);
+    
     console.log('🔄 localStorage after clearing:', {
       logs: localStorage.getItem('butterloss_logs'),
       rewards: localStorage.getItem('butterloss_rewards'),
@@ -734,6 +739,11 @@ const App: React.FC = () => {
       for (let i = 0; i < 4; i++) {
         localStorage.removeItem(`milestone_${i}_achieved`);
       }
+      
+      // Clear today's exercise and food calories
+      const currentDate = getCurrentDate();
+      localStorage.removeItem(`butterloss_exercise_${currentDate}`);
+      localStorage.removeItem(`butterloss_food_${currentDate}`);
       
       // Clear user data but keep the basic info for pre-filling
       localStorage.removeItem('butterloss_user');
@@ -889,6 +899,7 @@ const App: React.FC = () => {
               logsLength={logs.length}
               resetFlag={resetFlag}
               autoFillDeficit={autoFillDeficit}
+              currentDeficitCalculation={currentDeficitInput}
               onDeficitChange={(deficit) => {
                 console.log('Deficit input changed:', deficit);
                 setCurrentDeficitInput(deficit);
