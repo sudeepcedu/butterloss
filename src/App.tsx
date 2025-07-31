@@ -681,6 +681,9 @@ const App: React.FC = () => {
     setGoalCompletedHandled(false);
     setResetFlag(prev => prev + 1);
     
+    // Reset food eaten sync value
+    setFoodEatenForSync(null);
+    
     // Clear localStorage for current iteration
     localStorage.removeItem('butterloss_logs');
     localStorage.removeItem('butterloss_rewards');
@@ -763,6 +766,7 @@ const App: React.FC = () => {
       setIterationCompletedToday(false);
       setPreviousRemainingDeficit(null);
       setResetFlag(prev => prev + 1);
+      setFoodEatenForSync(null);
       setCurrentView('setup');
       
       // Re-enable localStorage saving after a short delay
@@ -882,10 +886,45 @@ const App: React.FC = () => {
                 onAutoFillDeficit={(deficit) => {
                   console.log('Auto-filling deficit:', deficit);
                   setAutoFillDeficit(deficit);
+                  
+                  // If food is logged, update the existing deficit log
+                  const today = getCurrentDate();
+                  const existingLogIndex = logs.findIndex(log => log.date === today);
+                  console.log('Looking for existing log for today:', today, 'Found at index:', existingLogIndex);
+                  if (existingLogIndex >= 0) {
+                    console.log('Updating existing deficit log due to exercise change');
+                    console.log('Old deficit:', logs[existingLogIndex].deficit, 'New deficit:', deficit);
+                    const updatedLogs = [...logs];
+                    updatedLogs[existingLogIndex] = {
+                      ...updatedLogs[existingLogIndex],
+                      deficit: deficit
+                    };
+                    setLogs(updatedLogs);
+                    localStorage.setItem('butterloss_logs', JSON.stringify(updatedLogs));
+                    console.log('Updated logs:', updatedLogs);
+                  } else {
+                    console.log('No existing log found for today');
+                  }
                 }}
                 onExerciseChange={(exercise) => {
                   console.log('Exercise calories updated:', exercise);
                   setCurrentExerciseCalories(exercise);
+                }}
+                onFoodLogged={(foodEaten) => {
+                  console.log('Food logged:', foodEaten);
+                  // Calculate and log the deficit
+                  const sedentaryCalories = calculateTDEE(currentWeight, user.height, user.age, user.sex);
+                  const totalBurn = sedentaryCalories + currentExerciseCalories;
+                  const deficit = totalBurn - foodEaten;
+                  
+                  // Auto-log the deficit
+                  const today = getCurrentDate();
+                  const log: DailyLog = {
+                    date: today,
+                    deficit: deficit,
+                    weight: null
+                  };
+                  handleLogSubmit(log);
                 }}
                 syncedDeficit={currentDeficitInput}
                 syncedFoodEaten={foodEatenForSync}
