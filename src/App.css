@@ -14,6 +14,7 @@
   flex-wrap: wrap;
   gap: 20px;
   position: relative;
+  min-height: 80px;
 }
 
 .app-header h1 {
@@ -25,13 +26,16 @@
 
 .nav-tabs {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  max-width: calc(100% - 40px);
+  z-index: 10;
+  padding: 0 10px;
 }
 
 .nav-tabs {
@@ -43,12 +47,15 @@
 .nav-tab {
   background: none;
   border: 2px solid #e1e5e9;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
   white-space: nowrap;
+  font-size: 0.9rem;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .nav-tab:hover {
@@ -258,13 +265,17 @@
     gap: 8px;
     flex-wrap: wrap;
     width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
   }
 
   .nav-tab {
     padding: 8px 12px;
     font-size: 0.8rem;
     min-width: auto;
-    flex: 0 1 auto;
+    flex: 1 1 auto;
+    max-width: 120px;
+    text-align: center;
   }
 
   .app-main {
@@ -327,42 +338,77 @@
   .app-header {
     padding: 10px;
     gap: 10px;
+    min-height: auto;
   }
 
   .app-header h1 {
     font-size: 1.3rem;
+    margin-bottom: 8px;
   }
 
   .nav-tabs {
     gap: 6px;
+    padding: 0 5px;
   }
 
   .nav-tab {
-    padding: 6px 10px;
+    padding: 6px 8px;
     font-size: 0.75rem;
-    min-height: 40px;
+    min-height: 36px;
+    max-width: 100px;
+    flex: 1 1 auto;
+  }
+}
+
+/* Tablet/iPad optimizations */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .app-header {
+    padding: 20px;
+    gap: 20px;
+    min-height: 100px;
   }
 
-  .app-main {
-    padding: 10px;
+  .app-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
   }
 
-  .user-info {
-    padding: 12px;
+  .nav-tabs {
+    position: static;
+    transform: none;
+    left: auto;
+    order: 2;
+    justify-content: center;
     gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 20px;
   }
 
-  .user-info h2 {
-    font-size: 1rem;
+  .nav-tab {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    min-height: 44px;
+    max-width: 140px;
+    flex: 1 1 auto;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Large tablet and small desktop */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .nav-tabs {
+    gap: 6px;
+    padding: 0 15px;
   }
 
-  .user-info p {
+  .nav-tab {
+    padding: 8px 14px;
     font-size: 0.85rem;
-  }
-
-  .date-display {
-    top: 8px;
-    left: 12px;
-    font-size: 0.75rem;
+    max-width: 120px;
   }
 } 
