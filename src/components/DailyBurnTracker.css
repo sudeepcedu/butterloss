@@ -86,6 +86,12 @@
   font-weight: 500;
 }
 
+.food-input:disabled {
+  color: #27ae60; /* Keep the same green color when disabled */
+  background-color: transparent; /* Keep transparent background */
+  cursor: not-allowed;
+}
+
 .total-calories {
   font-weight: bold;
   font-style: italic;
@@ -134,25 +140,42 @@
 }
 
 .food-tick-btn,
-.food-cross-btn,
-.food-edit-btn {
+.food-cross-btn {
   background: none;
-  border: none;
+  border: 1px solid;
   cursor: pointer;
-  font-size: 1rem;
-  padding: 2px 4px;
-  border-radius: 4px;
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  border-radius: 6px;
   transition: all 0.2s ease;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.food-tick-btn {
+  border-color: #28a745;
+  color: #28a745;
 }
 
 .food-tick-btn:hover {
-  background-color: rgba(40, 167, 69, 0.1);
-  transform: scale(1.1);
+  background-color: #28a745;
+  color: white;
+  transform: scale(1.05);
+}
+
+.food-cross-btn {
+  border-color: #dc3545;
+  color: #dc3545;
 }
 
 .food-cross-btn:hover {
-  background-color: rgba(220, 53, 69, 0.1);
-  transform: scale(1.1);
+  background-color: #dc3545;
+  color: white;
+  transform: scale(1.05);
 }
 
 .food-edit-btn {
@@ -160,6 +183,12 @@
   text-decoration: underline;
   font-size: 0.85rem;
   font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .food-edit-btn:hover {
@@ -193,5 +222,91 @@
   .food-edit-btn {
     font-size: 0.8rem;
     padding: 1px 2px;
+  }
+}
+
+/* Food confirmation popup styles */
+.food-confirm-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.food-confirm-popup {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  width: 90%;
+  text-align: center;
+}
+
+.food-confirm-content p {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.food-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.food-confirm-yes-btn,
+.food-confirm-no-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.food-confirm-yes-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.food-confirm-yes-btn:hover {
+  background-color: #218838;
+  transform: scale(1.02);
+}
+
+.food-confirm-no-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.food-confirm-no-btn:hover {
+  background-color: #5a6268;
+  transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .food-confirm-popup {
+    padding: 20px;
+    max-width: 280px;
+  }
+  
+  .food-confirm-content p {
+    font-size: 0.9rem;
+  }
+  
+  .food-confirm-yes-btn,
+  .food-confirm-no-btn {
+    padding: 6px 16px;
+    font-size: 0.85rem;
   }
 } 
