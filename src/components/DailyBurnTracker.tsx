@@ -182,19 +182,7 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     }
   };
 
-  const handleFoodBlur = () => {
-    console.log('🔄 DailyBurnTracker - Food blur, recalculating deficit:', {
-      sedentaryCalories,
-      exerciseCalories: exerciseCaloriesNum,
-      foodCalories: foodCaloriesNum,
-      totalBurn,
-      deficit
-    });
-    // Only auto-fill deficit if food calories are meaningful (not empty and not "0")
-    if (onAutoFillDeficit && foodCalories.trim() !== '' && foodCalories.trim() !== '0') {
-      onAutoFillDeficit(deficit);
-    }
-  };
+
 
   const handleFoodTick = () => {
     console.log('🔄 DailyBurnTracker - Food logged with tick:', foodCaloriesNum);
@@ -256,7 +244,6 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
           value={foodCalories}
           onChange={handleFoodChange}
           onKeyPress={handleFoodKeyPress}
-          onBlur={handleFoodBlur}
           onClick={handleFoodInputClick}
           pattern="[0-9]*"
           inputMode="numeric"
