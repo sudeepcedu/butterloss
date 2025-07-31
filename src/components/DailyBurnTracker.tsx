@@ -34,6 +34,14 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     if (savedFood && savedFood !== '0') {
       setFoodCalories(savedFood);
     }
+    
+    // Check if there's a deficit logged for today (which means food was logged)
+    const logs = JSON.parse(localStorage.getItem('butterloss_logs') || '[]');
+    const todayLog = logs.find((log: any) => log.date === today);
+    if (todayLog && todayLog.deficit !== null && todayLog.deficit !== undefined) {
+      console.log('🔄 DailyBurnTracker - Found logged deficit for today, setting isFoodLogged to true');
+      setIsFoodLogged(true);
+    }
   }, []);
 
   // Save exercise calories to localStorage
@@ -73,8 +81,8 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
       console.log('🔄 DailyBurnTracker - Updating food calories from sync:', syncedFoodEaten);
       setFoodCalories(syncedFoodEaten.toString());
       saveFoodCalories(syncedFoodEaten.toString());
-      // Mark as logged since it was calculated from deficit input
-      setIsFoodLogged(true);
+      // Don't automatically mark as logged - let user decide via tick button or Enter key
+      // setIsFoodLogged(true);
     }
   }, [syncedFoodEaten]);
 
