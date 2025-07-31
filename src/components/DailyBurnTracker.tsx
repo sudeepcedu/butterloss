@@ -18,6 +18,9 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
   const [exerciseCalories, setExerciseCalories] = useState('');
   const [foodCalories, setFoodCalories] = useState('');
   const [isFoodLogged, setIsFoodLogged] = useState(false);
+  const [showFoodConfirmPopup, setShowFoodConfirmPopup] = useState(false);
+  const [pendingFoodValue, setPendingFoodValue] = useState('');
+  const [isEnterPressed, setIsEnterPressed] = useState(false);
 
   // Helper function to get current date
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -176,6 +179,9 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
       e.preventDefault();
       console.log('🔄 DailyBurnTracker - Food logged with Enter key:', foodCaloriesNum);
       
+      // Set flag to prevent popup on blur
+      setIsEnterPressed(true);
+      
       // Log the food (same as clicking tick button)
       if (foodCalories.trim() !== '' && foodCalories.trim() !== '0') {
         setIsFoodLogged(true);
@@ -215,6 +221,40 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     setIsFoodLogged(false);
   };
 
+  // Handle food input blur (when user clicks outside)
+  const handleFoodBlur = () => {
+    // Don't show popup if Enter was pressed (food was already logged)
+    if (isEnterPressed) {
+      setIsEnterPressed(false);
+      return;
+    }
+    
+    if (!isFoodLogged && foodCalories.trim() && foodCalories.trim() !== '0') {
+      console.log('🔄 DailyBurnTracker - Food blur with value, showing confirmation popup');
+      setPendingFoodValue(foodCalories);
+      setShowFoodConfirmPopup(true);
+    }
+  };
+
+  // Handle food confirmation popup
+  const handleFoodConfirmYes = () => {
+    console.log('🔄 DailyBurnTracker - User confirmed food logging:', pendingFoodValue);
+    setFoodCalories(pendingFoodValue);
+    setIsFoodLogged(true);
+    if (onFoodLogged) {
+      onFoodLogged(parseInt(pendingFoodValue) || 0);
+    }
+    setShowFoodConfirmPopup(false);
+    setPendingFoodValue('');
+  };
+
+  const handleFoodConfirmNo = () => {
+    console.log('🔄 DailyBurnTracker - User cancelled food logging');
+    setFoodCalories('');
+    setShowFoodConfirmPopup(false);
+    setPendingFoodValue('');
+  };
+
 
 
   return (
@@ -247,9 +287,11 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
           value={foodCalories}
           onChange={handleFoodChange}
           onKeyPress={handleFoodKeyPress}
+          onBlur={handleFoodBlur}
           pattern="[0-9]*"
           inputMode="numeric"
           placeholder="0"
+          disabled={isFoodLogged}
         />
         <span className="food-unit">cal</span>
         {!isFoodLogged && foodCalories.trim() && (
@@ -258,17 +300,17 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
               type="button" 
               className="food-tick-btn"
               onClick={handleFoodTick}
-              title="Log food eaten"
+              title="Save"
             >
-              ✅
+              ✓
             </button>
             <button 
               type="button" 
               className="food-cross-btn"
               onClick={handleFoodCross}
-              title="Cancel"
+              title="Clear"
             >
-              ❌
+              ✕
             </button>
           </div>
         )}
@@ -279,10 +321,37 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
             onClick={handleFoodEdit}
             title="Edit food eaten"
           >
-            (edit)
+            edit
           </button>
         )}
       </div>
+      
+      {/* Food confirmation popup */}
+      {showFoodConfirmPopup && (
+        <div className="food-confirm-popup-overlay">
+          <div className="food-confirm-popup">
+            <div className="food-confirm-content">
+              <p>Do you want to log {pendingFoodValue} calories in Food Eaten?</p>
+              <div className="food-confirm-buttons">
+                <button 
+                  type="button" 
+                  className="food-confirm-yes-btn"
+                  onClick={handleFoodConfirmYes}
+                >
+                  Yes
+                </button>
+                <button 
+                  type="button" 
+                  className="food-confirm-no-btn"
+                  onClick={handleFoodConfirmNo}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
