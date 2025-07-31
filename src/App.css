@@ -56,6 +56,11 @@
   font-size: 0.9rem;
   min-width: 0;
   flex-shrink: 1;
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-tab:hover {
@@ -273,9 +278,13 @@
     padding: 8px 12px;
     font-size: 0.8rem;
     min-width: auto;
-    flex: 1 1 auto;
-    max-width: 120px;
+    flex: 0 1 auto;
+    max-width: none;
     text-align: center;
+    width: auto;
+    height: auto;
+    white-space: nowrap;
+    overflow: visible;
   }
 
   .app-main {
@@ -355,8 +364,12 @@
     padding: 6px 8px;
     font-size: 0.75rem;
     min-height: 36px;
-    max-width: 100px;
-    flex: 1 1 auto;
+    max-width: none;
+    flex: 0 1 auto;
+    width: auto;
+    height: auto;
+    white-space: nowrap;
+    overflow: visible;
   }
 }
 
@@ -390,12 +403,13 @@
     padding: 10px 16px;
     font-size: 0.9rem;
     min-height: 44px;
-    max-width: 140px;
-    flex: 1 1 auto;
+    max-width: none;
+    flex: 0 1 auto;
     text-align: center;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    width: auto;
+    height: auto;
   }
 }
 
@@ -409,6 +423,10 @@
   .nav-tab {
     padding: 8px 14px;
     font-size: 0.85rem;
-    max-width: 120px;
+    max-width: none;
+    width: auto;
+    height: auto;
+    white-space: nowrap;
+    overflow: visible;
   }
 } 
