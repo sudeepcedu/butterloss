@@ -87,9 +87,11 @@
 }
 
 .food-input:disabled {
-  color: #27ae60; /* Keep the same green color when disabled */
-  background-color: transparent; /* Keep transparent background */
+  color: #27ae60 !important; /* Keep the same green color when disabled */
+  background-color: transparent !important; /* Keep transparent background */
   cursor: not-allowed;
+  opacity: 1 !important; /* Ensure full opacity on mobile */
+  -webkit-text-fill-color: #27ae60 !important; /* Force color on iOS Safari */
 }
 
 .total-calories {
