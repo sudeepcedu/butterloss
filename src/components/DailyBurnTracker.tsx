@@ -201,18 +201,13 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
     // Prevent any deficit logging when cancelling
   };
 
+  // Handle food edit button click
   const handleFoodEdit = () => {
     console.log('🔄 DailyBurnTracker - Food edit clicked');
     setIsFoodLogged(false);
   };
 
-  const handleFoodInputClick = () => {
-    // Enable editing when clicking directly in the input field
-    if (isFoodLogged) {
-      console.log('🔄 DailyBurnTracker - Food input clicked, enabling edit');
-      setIsFoodLogged(false);
-    }
-  };
+
 
   return (
     <div className="daily-burn-tracker">
@@ -244,7 +239,6 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
           value={foodCalories}
           onChange={handleFoodChange}
           onKeyPress={handleFoodKeyPress}
-          onClick={handleFoodInputClick}
           pattern="[0-9]*"
           inputMode="numeric"
           placeholder="0"
@@ -277,7 +271,7 @@ const DailyBurnTracker: React.FC<DailyBurnTrackerProps> = ({ user, currentWeight
             onClick={handleFoodEdit}
             title="Edit food eaten"
           >
-            ✏️
+            (edit)
           </button>
         )}
       </div>
