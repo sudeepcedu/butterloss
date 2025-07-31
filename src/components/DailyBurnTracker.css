@@ -155,9 +155,17 @@
   transform: scale(1.1);
 }
 
+.food-edit-btn {
+  color: #007bff;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .food-edit-btn:hover {
-  background-color: rgba(102, 126, 234, 0.1);
-  transform: scale(1.1);
+  color: #0056b3;
+  background-color: rgba(0, 123, 255, 0.1);
+  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
