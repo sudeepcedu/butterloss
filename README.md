@@ -6,7 +6,7 @@ A modern, intuitive web application for tracking your weight loss journey throug
 
 ### 📊 **Dashboard**
 - **Calorie Deficit Progress**: Visual progress bar with animated green gradient
-- **Current Streak**: Track consecutive days with positive deficit
+- **Current Streak**: Track consecutive days with logged deficit
 - **Butter & Ghee Collection**: Collect butter packs (770 cal) and ghee packs (7700 cal)
 - **Estimated Completion**: Smart calculation based on daily deficit goals
 - **Average Daily Deficit**: Accurate tracking of your daily calorie burn

@@ -26,6 +26,7 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [pendingDeficitValue, setPendingDeficitValue] = useState('');
   const [originalDeficitValue, setOriginalDeficitValue] = useState<number | null>(null);
+  const [isSubmittingViaButton, setIsSubmittingViaButton] = useState(false);
   const deficitInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when todayLog changes (e.g., after restart journey)
@@ -126,6 +127,8 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     console.log('🔄 DailyLogForm handleSubmit - Setting isSubmittingManually to true');
     // Set flag to prevent onDeficitChange from firing during submission
     setIsSubmittingManually(true);
+    // Set flag to indicate this is a button submission (not blur)
+    setIsSubmittingViaButton(true);
     
     // Check if the value was actually changed from the original auto-calculated value
     const wasValueChanged = originalAutoCalculatedDeficit !== null && deficitValue !== originalAutoCalculatedDeficit;
@@ -157,15 +160,29 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     setLoggedDeficit(deficitValue);
     setShowConfirmation(true);
     
-    // Reset the flag after a short delay to allow state updates to complete
+    // Reset the flags after a short delay to allow state updates to complete
     setTimeout(() => {
-      console.log('🔄 DailyLogForm handleSubmit - Resetting isSubmittingManually to false');
+      console.log('🔄 DailyLogForm handleSubmit - Resetting flags to false');
       setIsSubmittingManually(false);
+      setIsSubmittingViaButton(false);
     }, 100);
   };
 
   // Handle deficit input blur
-  const handleDeficitBlur = () => {
+  const handleDeficitBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Check if the related target (what we're clicking on) is the submit button
+    const relatedTarget = e.relatedTarget as HTMLButtonElement;
+    if (relatedTarget && relatedTarget.type === 'submit') {
+      console.log('🔄 DailyLogForm handleDeficitBlur - Submit button clicked, ignoring blur');
+      return;
+    }
+    
+    // If submitting via button, don't show popup
+    if (isSubmittingViaButton) {
+      console.log('🔄 DailyLogForm handleDeficitBlur - Button submission in progress, ignoring blur');
+      return;
+    }
+    
     const currentValue = parseInt(deficit) || 0;
     
     // If not in edit mode (originalDeficitValue is null), this is a first-time entry
@@ -252,8 +269,19 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
   const handleUpdateCancel = () => {
     console.log('🔄 DailyLogForm handleUpdateCancel - Reverting to original value');
     if (originalDeficitValue !== null) {
-      // In edit mode - revert to original value
+      // In edit mode - revert to original value and auto-log it
       setDeficit(originalDeficitValue.toString());
+      
+      // Auto-log the original value
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const log: DailyLog = {
+        date: today,
+        deficit: originalDeficitValue,
+        weight: null
+      };
+      onLogSubmit(log);
+      setLoggedDeficit(originalDeficitValue);
+      setShowConfirmation(true);
     } else {
       // In first-time entry mode - clear the field
       setDeficit('');
@@ -286,7 +314,11 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
             <small>calories (negative if you ate more than burned)</small>
           </div>
 
-          <button type="submit" className="log-btn">
+          <button 
+            type="submit" 
+            className="log-btn"
+            onMouseDown={() => setIsSubmittingViaButton(true)}
+          >
             Log Progress ✅
           </button>
         </form>
@@ -295,8 +327,17 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
           <div className="confirmation-message">
             <div className="confirmation-icon">🧈</div>
             <div className="confirmation-text">
-              <p>You've logged <strong className={loggedDeficit && loggedDeficit < 0 ? 'negative-calories' : ''}>{loggedDeficit}</strong> calories deficit for today.</p>
-              <p>Come back tomorrow to keep the streak going! 🔥</p>
+              {loggedDeficit && loggedDeficit < 0 ? (
+                <>
+                  <p>🍫 You've logged a surplus of <strong className="negative-calories">{Math.abs(loggedDeficit)}</strong> calories today.</p>
+                  <p>It happens! Let's bounce back strong tomorrow! 💪</p>
+                </>
+              ) : (
+                <>
+                  <p>You've logged <strong>{loggedDeficit}</strong> calories deficit for today.</p>
+                  <p>Come back tomorrow to keep the streak going! 🔥</p>
+                </>
+              )}
             </div>
           </div>
           <div className="confirmation-actions">

@@ -21,7 +21,10 @@ const EstimatedCompletion: React.FC<EstimatedCompletionProps> = ({ data, onUpdat
   useEffect(() => {
     if (isEditing && goalInputRef.current) {
       setTimeout(() => {
-        goalInputRef.current?.focus();
+        if (goalInputRef.current) {
+          goalInputRef.current.focus();
+          goalInputRef.current.select(); // Select all text
+        }
       }, 100);
     }
   }, [isEditing]);

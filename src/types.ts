@@ -23,7 +23,7 @@ export interface WeightLossData {
   remainingDeficit: number;
   butterPacks: number; // 770 calories = 1 butter pack (100g fat)
   gheePacks: number; // 7700 calories = 1 ghee pack (1kg fat)
-  currentStreak: number; // consecutive days with > 0 deficit
+  currentStreak: number; // consecutive days with logged deficit
 }
 
 export interface IterationSummary {

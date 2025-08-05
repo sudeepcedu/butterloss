@@ -46,17 +46,17 @@ export const calculateCurrentStreak = (logs: DailyLog[]): number => {
   const todayLog = sortedLogs.find(log => isSameDay(new Date(log.date), today));
   const yesterdayLog = sortedLogs.find(log => isSameDay(new Date(log.date), yesterday));
   
-  // If no entry for today, check if yesterday had a positive deficit
+  // If no entry for today, check if yesterday had a logged deficit
   if (!todayLog) {
-    if (!yesterdayLog || (yesterdayLog.deficit || 0) <= 0) {
-      return 0; // No streak if yesterday is missing or had non-positive deficit
+    if (!yesterdayLog || yesterdayLog.deficit === null) {
+      return 0; // No streak if yesterday is missing or had no deficit logged
     }
-    // Yesterday had positive deficit but no today entry - streak is 1
+    // Yesterday had a logged deficit but no today entry - streak is 1
     return 1;
   }
   
-  // If today's entry exists but is not positive, no streak
-  if ((todayLog.deficit || 0) <= 0) {
+  // If today's entry exists but has no deficit logged, no streak
+  if (todayLog.deficit === null) {
     return 0;
   }
   
@@ -70,11 +70,11 @@ export const calculateCurrentStreak = (logs: DailyLog[]): number => {
     const logDate = new Date(log.date);
     const daysDiff = Math.floor((currentDate.getTime() - logDate.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (daysDiff === 1 && (log.deficit || 0) > 0) {
+    if (daysDiff === 1 && log.deficit !== null) {
       streak++;
       currentDate = logDate;
     } else {
-      break; // Gap in days or non-positive deficit, streak broken
+      break; // Gap in days or no deficit logged, streak broken
     }
   }
   
