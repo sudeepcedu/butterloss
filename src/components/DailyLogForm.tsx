@@ -13,12 +13,19 @@ interface DailyLogFormProps {
   currentDeficitCalculation?: number | null;
   onDeficitChange?: (deficit: number | null) => void;
   onDeficitInputChange?: (deficit: number | null) => void;
+  onDeficitManuallySubmitted?: (deficit: number) => void;
+  isDeficitManuallyEntered?: boolean;
+  originalAutoCalculatedDeficit?: number | null;
 }
 
-const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, currentDeficitCalculation, onDeficitChange, onDeficitInputChange }) => {
+const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight, todayLog, logsLength = 0, resetFlag = 0, autoFillDeficit, currentDeficitCalculation, onDeficitChange, onDeficitInputChange, onDeficitManuallySubmitted, isDeficitManuallyEntered = false, originalAutoCalculatedDeficit = null }) => {
   const [deficit, setDeficit] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(!!todayLog);
   const [loggedDeficit, setLoggedDeficit] = useState<number | null>(todayLog?.deficit || null);
+  const [isSubmittingManually, setIsSubmittingManually] = useState(false);
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+  const [pendingDeficitValue, setPendingDeficitValue] = useState('');
+  const [originalDeficitValue, setOriginalDeficitValue] = useState<number | null>(null);
   const deficitInputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when todayLog changes (e.g., after restart journey)
@@ -66,13 +73,8 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     }
   }, [autoFillDeficit, onLogSubmit]);
 
-  // Notify parent when deficit changes
-  useEffect(() => {
-    if (onDeficitChange) {
-      const deficitValue = deficit ? parseInt(deficit) : null;
-      onDeficitChange(deficitValue);
-    }
-  }, [deficit, onDeficitChange]);
+  // Food Eaten is purely user input - no calculations
+  // Removed useEffect that was calling onDeficitChange
 
   // Update deficit field when calculation changes (but only if user hasn't manually entered a deficit)
   useEffect(() => {
@@ -121,10 +123,29 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
       return;
     }
     
-    // Trigger food eaten update when deficit is submitted
-    if (onDeficitInputChange) {
-      onDeficitInputChange(deficitValue);
+    console.log('🔄 DailyLogForm handleSubmit - Setting isSubmittingManually to true');
+    // Set flag to prevent onDeficitChange from firing during submission
+    setIsSubmittingManually(true);
+    
+    // Check if the value was actually changed from the original auto-calculated value
+    const wasValueChanged = originalAutoCalculatedDeficit !== null && deficitValue !== originalAutoCalculatedDeficit;
+    
+    console.log('🔄 DailyLogForm handleSubmit - Value comparison:', {
+      currentValue: deficitValue,
+      originalAutoCalculated: originalAutoCalculatedDeficit,
+      wasValueChanged
+    });
+    
+    // Only notify parent that deficit was manually submitted if the value was actually changed
+    if (wasValueChanged && onDeficitManuallySubmitted) {
+      console.log('🔄 DailyLogForm handleSubmit - Value changed, calling onDeficitManuallySubmitted with:', deficitValue);
+      onDeficitManuallySubmitted(deficitValue);
+    } else {
+      console.log('🔄 DailyLogForm handleSubmit - Value unchanged, not calling onDeficitManuallySubmitted');
     }
+    
+    // Don't trigger food eaten update when deficit is manually submitted
+    // This prevents bidirectional sync when user explicitly enters a deficit
     
     const today = format(new Date(), 'yyyy-MM-dd');
     const log: DailyLog = {
@@ -135,17 +156,63 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     onLogSubmit(log);
     setLoggedDeficit(deficitValue);
     setShowConfirmation(true);
+    
+    // Reset the flag after a short delay to allow state updates to complete
+    setTimeout(() => {
+      console.log('🔄 DailyLogForm handleSubmit - Resetting isSubmittingManually to false');
+      setIsSubmittingManually(false);
+    }, 100);
   };
 
+  // Handle deficit input blur
   const handleDeficitBlur = () => {
-    const deficitValue = parseInt(deficit);
-    if (!isNaN(deficitValue) && onDeficitInputChange) {
-      onDeficitInputChange(deficitValue);
+    const currentValue = parseInt(deficit) || 0;
+    
+    // If not in edit mode (originalDeficitValue is null), this is a first-time entry
+    if (!originalDeficitValue) {
+      // Only show popup if user entered a value
+      if (currentValue > 0) {
+        console.log('🔄 DailyLogForm handleDeficitBlur - First-time entry with value, showing popup');
+        setPendingDeficitValue(currentValue.toString());
+        setShowUpdatePopup(true);
+      }
+      return;
+    }
+    
+    // In edit mode - compare with original value
+    const originalValue = originalDeficitValue;
+    
+    console.log('🔄 DailyLogForm handleDeficitBlur - Value comparison:', {
+      currentValue,
+      originalValue,
+      isChanged: currentValue !== originalValue
+    });
+    
+    if (currentValue === originalValue) {
+      // No change - auto-log the same value
+      console.log('🔄 DailyLogForm handleDeficitBlur - No change, auto-logging same value');
+      const today = format(new Date(), 'yyyy-MM-dd');
+      const log: DailyLog = {
+        date: today,
+        deficit: currentValue,
+        weight: null
+      };
+      onLogSubmit(log);
+      setLoggedDeficit(currentValue);
+      setShowConfirmation(true);
+      setOriginalDeficitValue(null); // Clear original value
+    } else {
+      // Value changed - show popup
+      console.log('🔄 DailyLogForm handleDeficitBlur - Value changed, showing popup');
+      setPendingDeficitValue(currentValue.toString());
+      setShowUpdatePopup(true);
     }
   };
 
   const handleEdit = () => {
     setShowConfirmation(false);
+    // Store the original value for comparison
+    setOriginalDeficitValue(loggedDeficit);
     // Restore the previously entered deficit value
     if (loggedDeficit !== null) {
       setDeficit(loggedDeficit.toString());
@@ -154,6 +221,46 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
     setTimeout(() => {
       deficitInputRef.current?.focus();
     }, 100);
+  };
+
+  // Handle popup confirmation
+  const handleUpdateConfirm = () => {
+    const newValue = parseInt(pendingDeficitValue) || 0;
+    console.log('🔄 DailyLogForm handleUpdateConfirm - Logging new value:', newValue);
+    
+    // Always treat popup confirmation as manual entry
+    if (onDeficitManuallySubmitted) {
+      console.log('🔄 DailyLogForm handleUpdateConfirm - Calling onDeficitManuallySubmitted for popup confirmation');
+      onDeficitManuallySubmitted(newValue);
+    }
+    
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const log: DailyLog = {
+      date: today,
+      deficit: newValue,
+      weight: null
+    };
+    onLogSubmit(log);
+    setLoggedDeficit(newValue);
+    setShowConfirmation(true);
+    setShowUpdatePopup(false);
+    setPendingDeficitValue('');
+    setOriginalDeficitValue(null);
+  };
+
+  // Handle popup cancellation
+  const handleUpdateCancel = () => {
+    console.log('🔄 DailyLogForm handleUpdateCancel - Reverting to original value');
+    if (originalDeficitValue !== null) {
+      // In edit mode - revert to original value
+      setDeficit(originalDeficitValue.toString());
+    } else {
+      // In first-time entry mode - clear the field
+      setDeficit('');
+    }
+    setShowUpdatePopup(false);
+    setPendingDeficitValue('');
+    setOriginalDeficitValue(null);
   };
 
 
@@ -200,6 +307,39 @@ const DailyLogForm: React.FC<DailyLogFormProps> = ({ onLogSubmit, currentWeight,
             >
               Edit
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Update confirmation popup */}
+      {showUpdatePopup && (
+        <div className="update-popup-overlay">
+          <div className="update-popup">
+            <div className="update-popup-content">
+              <p>
+                {originalDeficitValue !== null 
+                  ? <>You've updated today's deficit to <strong>{pendingDeficitValue}</strong> cal, but haven't logged it.</>
+                  : <>You've entered <strong>{pendingDeficitValue}</strong> cal deficit, but haven't logged it.</>
+                }
+              </p>
+              <p>Do you want to save it?</p>
+              <div className="update-popup-buttons">
+                <button 
+                  type="button" 
+                  className="update-confirm-btn"
+                  onClick={handleUpdateConfirm}
+                >
+                  Yes
+                </button>
+                <button 
+                  type="button" 
+                  className="update-cancel-btn"
+                  onClick={handleUpdateCancel}
+                >
+                  No
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

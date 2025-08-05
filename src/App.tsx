@@ -46,6 +46,9 @@ const App: React.FC = () => {
   const [currentDeficitInput, setCurrentDeficitInput] = useState<number | null>(null);
   const [foodEatenForSync, setFoodEatenForSync] = useState<number | null>(null);
   const [currentExerciseCalories, setCurrentExerciseCalories] = useState<number>(0);
+  const [isDeficitManuallyEntered, setIsDeficitManuallyEntered] = useState<boolean>(false);
+  const [isDeficitAutoLogged, setIsDeficitAutoLogged] = useState<boolean>(false);
+  const [originalAutoCalculatedDeficit, setOriginalAutoCalculatedDeficit] = useState<number | null>(null);
 
   // Helper function to get current date in YYYY-MM-DD format
   const getCurrentDate = () => new Date().toLocaleDateString('en-CA');
@@ -211,6 +214,39 @@ const App: React.FC = () => {
 
   useEffect(() => {
     console.log('Logs state changed:', logs);
+  }, [logs]);
+
+  // Check if there's a deficit logged for today and set manual entry state
+    useEffect(() => {
+    if (logs.length > 0) {
+      const today = getCurrentDate();
+      const todayLog = logs.find(log => log.date === today);
+
+      if (todayLog && todayLog.deficit !== null && todayLog.deficit !== undefined) {
+        // Check if this deficit was auto-calculated by looking for the original deficit in localStorage
+        const savedOriginalDeficit = localStorage.getItem(`butterloss_original_deficit_${today}`);
+        
+        if (savedOriginalDeficit) {
+          // This was auto-calculated - restore the original deficit and keep fields unlocked
+          const originalDeficit = parseInt(savedOriginalDeficit);
+          setOriginalAutoCalculatedDeficit(originalDeficit);
+          setIsDeficitAutoLogged(true);
+          setIsDeficitManuallyEntered(false);
+          console.log('🔄 Found auto-calculated deficit for today, keeping fields unlocked. Original deficit:', originalDeficit);
+        } else {
+          // This was manually entered - lock the fields
+          setIsDeficitManuallyEntered(true);
+          setIsDeficitAutoLogged(false);
+          setOriginalAutoCalculatedDeficit(null);
+          console.log('🔄 Found manually entered deficit for today, setting isDeficitManuallyEntered to true');
+        }
+      } else {
+        console.log('🔄 No deficit logged for today, setting isDeficitManuallyEntered to false');
+        setIsDeficitManuallyEntered(false);
+        setIsDeficitAutoLogged(false);
+        setOriginalAutoCalculatedDeficit(null);
+      }
+    }
   }, [logs]);
 
   // Auto-trigger weight input modal when goal is completed
@@ -684,6 +720,11 @@ const App: React.FC = () => {
     // Reset food eaten sync value
     setFoodEatenForSync(null);
     
+    // Reset manual deficit entry state to unlock fields
+    setIsDeficitManuallyEntered(false);
+    setIsDeficitAutoLogged(false);
+    setOriginalAutoCalculatedDeficit(null);
+    
     // Clear localStorage for current iteration
     localStorage.removeItem('butterloss_logs');
     localStorage.removeItem('butterloss_rewards');
@@ -767,6 +808,9 @@ const App: React.FC = () => {
       setPreviousRemainingDeficit(null);
       setResetFlag(prev => prev + 1);
       setFoodEatenForSync(null);
+      setIsDeficitManuallyEntered(false);
+      setIsDeficitAutoLogged(false);
+      setOriginalAutoCalculatedDeficit(null);
       setCurrentView('setup');
       
       // Re-enable localStorage saving after a short delay
@@ -912,22 +956,53 @@ const App: React.FC = () => {
                 }}
                 onFoodLogged={(foodEaten) => {
                   console.log('Food logged:', foodEaten);
+                  
+                  // Set flag to indicate this is auto-logged from Food Eaten
+                  setIsDeficitAutoLogged(true);
+                  setIsDeficitManuallyEntered(false);
+                  
                   // Calculate and log the deficit
                   const sedentaryCalories = calculateTDEE(currentWeight, user.height, user.age, user.sex);
                   const totalBurn = sedentaryCalories + currentExerciseCalories;
                   const deficit = totalBurn - foodEaten;
                   
-                  // Auto-log the deficit
+                  // Store the original auto-calculated deficit for comparison
+                  setOriginalAutoCalculatedDeficit(deficit);
+                  
+                  // Save to localStorage for persistence across page refreshes
                   const today = getCurrentDate();
+                  localStorage.setItem(`butterloss_original_deficit_${today}`, deficit.toString());
+                  
+                  // Auto-log the deficit
                   const log: DailyLog = {
                     date: today,
                     deficit: deficit,
                     weight: null
                   };
                   handleLogSubmit(log);
+                  
+                  // Clear the synced food eaten to prevent override
+                  setFoodEatenForSync(null);
                 }}
                 syncedDeficit={currentDeficitInput}
-                syncedFoodEaten={foodEatenForSync}
+                isDeficitManuallyEntered={isDeficitManuallyEntered}
+                onUnlockFields={() => {
+                  console.log('Unlocking fields');
+                  setIsDeficitManuallyEntered(false);
+                  setIsDeficitAutoLogged(false);
+                  setOriginalAutoCalculatedDeficit(null);
+                  setCurrentDeficitInput(null);
+                  
+                  // Clear the deficit log for today
+                  const today = getCurrentDate();
+                  const updatedLogs = logs.filter(log => !(log.date === today && log.deficit !== null));
+                  setLogs(updatedLogs);
+                  
+                  // Clear the localStorage entry for original deficit
+                  localStorage.removeItem(`butterloss_original_deficit_${today}`);
+                  
+                  console.log('🔄 Cleared deficit log for today, remaining logs:', updatedLogs);
+                }}
               />
             </div>
             <DailyLogForm 
@@ -940,21 +1015,32 @@ const App: React.FC = () => {
               autoFillDeficit={autoFillDeficit}
               currentDeficitCalculation={currentDeficitInput}
               onDeficitChange={(deficit) => {
-                console.log('Deficit input changed:', deficit);
-                setCurrentDeficitInput(deficit);
+                console.log('Deficit input changed - NO FOOD CALCULATION');
+                // Food Eaten is purely user input - no calculations
+              }}
+              onDeficitManuallySubmitted={(deficit: number) => {
+                console.log('Deficit manually submitted:', deficit);
+                setIsDeficitManuallyEntered(true);
+                setIsDeficitAutoLogged(false);
+                // Clear the original auto-calculated deficit since this is a manual entry
+                setOriginalAutoCalculatedDeficit(null);
+                // Clear the localStorage entry for original deficit
+                const today = getCurrentDate();
+                localStorage.removeItem(`butterloss_original_deficit_${today}`);
+                // Clear the currentDeficitInput to prevent any food eaten calculations
+                setCurrentDeficitInput(null);
+                
+                // Clear exercise and food eaten fields when manually entering deficit
+                localStorage.removeItem(`butterloss_exercise_${today}`);
+                localStorage.removeItem(`butterloss_food_${today}`);
+                console.log('🔄 Cleared exercise and food eaten fields for manual deficit entry');
               }}
               onDeficitInputChange={(deficit) => {
-                console.log('Deficit input change for food sync:', deficit);
-                // Calculate food eaten based on deficit: food = totalBurn - deficit
-                if (deficit !== null && !isNaN(deficit)) {
-                  const sedentaryCalories = calculateTDEE(currentWeight, user.height, user.age, user.sex);
-                  const totalBurn = sedentaryCalories + currentExerciseCalories; // Use actual exercise value
-                  const foodEaten = totalBurn - deficit;
-                  console.log('Calculating food eaten:', { totalBurn, deficit, foodEaten, sedentaryCalories, currentExerciseCalories });
-                  // Update the food eaten in DailyBurnTracker
-                  setFoodEatenForSync(foodEaten);
-                }
+                console.log('Deficit input change - NO FOOD CALCULATION');
+                // Food Eaten is purely user input - no calculations
               }}
+              isDeficitManuallyEntered={isDeficitManuallyEntered}
+              originalAutoCalculatedDeficit={originalAutoCalculatedDeficit}
             />
             <DeficitProgress data={weightLossData} />
             <EstimatedCompletion data={weightLossData} onUpdateDailyGoal={handleUpdateDailyGoal} />
