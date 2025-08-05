@@ -873,7 +873,11 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>
+        <h1 
+          onClick={() => setCurrentView('dashboard')}
+          style={{ cursor: 'pointer' }}
+          title="Go to Dashboard"
+        >
           <img src="/butter-logo.png" alt="ButterLoss" style={{ width: '40px', height: '40px', verticalAlign: 'middle', marginRight: '10px' }} />
           ButterLoss
         </h1>
