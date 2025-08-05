@@ -178,10 +178,10 @@ const UserSetup: React.FC<UserSetupProps> = ({ onComplete }) => {
               required
               min="100"
               max="2000"
-              step="100"
+              step="1"
               placeholder="Enter your daily deficit goal"
             />
-            <small>Recommended: 300-700 calories for sustainable weight loss</small>
+            <small>Recommended: 300-770 calories for sustainable weight loss</small>
           </div>
 
           <button type="submit" className="submit-btn">
